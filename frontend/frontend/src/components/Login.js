@@ -1,25 +1,55 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { Link } from 'react-router-dom';
 
 function Login() {	
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
+	const [verifyPassword, setVerifyPassword] = React.useState(true);
 	
-	function handleSubmit(e){
+	async function handleSubmit(e){
 		e.preventDefault();
 		let myJSON = {}
 		myJSON.username = username;
 		myJSON.password = password;
 		console.log(myJSON);
-		loginRedirect();
+		const requestOptions = {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: JSON.stringify(
+			  `grant_type=&username=${username}&password=${password}&scope=&client_id=&client_secret=`
+			),
+		  };
+		const fetchResponse = await fetch(`http://localhost:8000/api/login/`, requestOptions);
+		const data = await fetchResponse.json();
+		if(fetchResponse.ok) {
+			setVerifyPassword(true);
+			loginRedirect();			
+		}
+		if (data.detail === 'Wrong username or password') {
+			setVerifyPassword(false);
+		}	
 	}
 
 	const history = useHistory();
 
 	const loginRedirect = () => {
 		history.push('/datasets');
+	}
+
+	const renderWrongPasswordError = () => {
+		console.log(verifyPassword);
+		if (verifyPassword === false) {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="error">
+						Wrong username or password
+					</Alert>
+				</Grid>
+			)
+		}
 	}
 
 	return (
@@ -49,6 +79,8 @@ function Login() {
 						onInput={ e => setPassword(e.target.value)}
 					/>
 				</Grid>
+				
+				{renderWrongPasswordError()}
 
 				<Grid item xs={12}>
 					<Button type="submit" variant="contained" color="primary">

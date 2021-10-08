@@ -6,13 +6,26 @@ function CreateAccount() {
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	
-	function handleSubmit(e){
+	async function handleSubmit(e){
 		e.preventDefault();
 		let myJSON = {}
 		myJSON.username = username;
 		myJSON.password = password;
 		console.log(myJSON);
-		loginRedirect();
+
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(myJSON)
+		};
+		const fetchResponse = await fetch(`http://localhost:8000/api/signup/`, requestOptions);
+		const data = await fetchResponse.json();
+		if(fetchResponse.ok) {
+			loginRedirect();			
+		}
+		if (data.detail === 'User already exists') {
+			alert('User already exists');
+		}	
 	}
 
 	const history = useHistory();

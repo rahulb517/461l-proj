@@ -2,7 +2,7 @@ import './App.css';
 import Home from './components/Home';
 import Login from './components/Login';
 import Datasets from './components/Datasets';
-import CreateAccount from './components/CreateAccount';
+import Signup from './components/Signup';
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
 
 
@@ -17,8 +17,8 @@ function App() {
 					<Route path="/login">
 						<Login />
 					</Route>
-					<Route path="/createaccount">
-						<CreateAccount />
+					<Route path="/signup">
+						<Signup />
 					</Route>
 					<Route path="/datasets">
 						<Datasets />
