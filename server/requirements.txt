@@ -1,0 +1,7 @@
+mongoengine==0.23.1
+uvicorn==0.15.0
+pydantic==1.8.2
+passlib==1.7.4
+fastapi==0.70.0
+pymongo[srv]==3.11
+python-multipart==0.0.5
