@@ -1,4 +1,19 @@
-.App {
+.datasets {
+	align-items: center;
+	margin:auto;
+	width: 60%;
+	justify-content: center;
+}
+
+.internalPage {
+	display: flex;
+	align-items: center;
+	margin:auto;
+	width: 60%;
+	justify-content: center;
+}
+
+.login {
 	display: flex;
 	justify-content: center;
 	align-items: center;

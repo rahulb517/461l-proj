@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Grid, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, TextField, Typography } from '@mui/material';
 
 function CreateAccount() {
 	const [username, setUsername] = React.useState('');
@@ -44,6 +44,7 @@ function CreateAccount() {
 
 				<Grid item xs={12}>
 					<TextField
+						required
 						id="standard-username-input"
 						label="Username"
 						onInput ={ e => setUsername(e.target.value)}
@@ -52,6 +53,7 @@ function CreateAccount() {
 
 				<Grid item xs={12}>
 					<TextField
+						required
 						id="standard-password-input"
 						label="Password"
 						type="password"

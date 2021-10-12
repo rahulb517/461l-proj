@@ -1,10 +1,12 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Grid, TextField, Typography } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Alert } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../AuthContext'
 
 function Login() {	
+	const [user, dispatch] = React.useContext(AuthContext)
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	const [verifyPassword, setVerifyPassword] = React.useState(true);
@@ -21,16 +23,38 @@ function Login() {
 			body: JSON.stringify(
 			  `grant_type=&username=${username}&password=${password}&scope=&client_id=&client_secret=`
 			),
-		  };
-		const fetchResponse = await fetch(`http://localhost:8000/api/login/`, requestOptions);
-		const data = await fetchResponse.json();
-		if(fetchResponse.ok) {
+		};
+
+		try {
+			const fetchResponse = await fetch(`http://localhost:8000/api/login/`, requestOptions);
+			const data = await fetchResponse.json();
+			if(!fetchResponse.ok){
+				throw data.detail;
+			}
 			setVerifyPassword(true);
-			loginRedirect();			
-		}
-		if (data.detail === 'Wrong username or password') {
+			dispatch({
+				type: 'LOGIN',
+				payload: {
+					token: data.access_token,
+					user: username
+				}
+			});
+			loginRedirect();	
+			
+		} catch (err) {
+			console.log(err)
 			setVerifyPassword(false);
-		}	
+		}
+
+		// const fetchResponse = await fetch(`http://localhost:8000/api/login/`, requestOptions);
+		// const data = await fetchResponse.json();
+		// if(fetchResponse.ok) {
+		// 	setVerifyPassword(true);
+		// 	loginRedirect();			
+		// }
+		// if (data.detail === 'Wrong username or password') {
+		// 	setVerifyPassword(false);
+		// }	
 	}
 
 	const history = useHistory();
@@ -40,7 +64,7 @@ function Login() {
 	}
 
 	const renderWrongPasswordError = () => {
-		console.log(verifyPassword);
+		// console.log(verifyPassword);
 		if (verifyPassword === false) {
 			return(
 				<Grid item xs={12}>
@@ -53,7 +77,7 @@ function Login() {
 	}
 
 	return (
-		<form onSubmit={ handleSubmit } >
+		<form className='login'onSubmit={ handleSubmit } >
 			<Grid container justifyContent="center" spacing={4}>
 				<Grid item xs={12}>
 					<Typography variant="h3">
@@ -88,7 +112,7 @@ function Login() {
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
-					<Button component={Link} to="/createaccount" variant="contained" color="secondary">
+					<Button component={Link} to="/signup" variant="contained" color="secondary">
 						Make an Account
 					</Button>		
 				</Grid>
