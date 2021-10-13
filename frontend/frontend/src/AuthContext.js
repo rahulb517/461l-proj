@@ -1,0 +1,45 @@
+import React from 'react';
+
+export const AuthContext = React.createContext();
+
+const initialState = {
+	isAuth: false,
+	user: null,
+	token: null
+}
+
+const authReducer = (state, action) => {
+	switch (action.type) {
+		case 'LOGIN':
+			localStorage.setItem('user', JSON.stringify(action.payload.userId));
+			localStorage.setItem('token', JSON.stringify(action.payload.token));
+	
+			return {
+				...state,
+				isAuth: true,
+				user: action.payload.user,
+				token: action.payload.token
+			}
+
+		case 'LOGOUT':
+			localStorage.clear();
+			return {
+				...state,
+				isAuth: false,
+				user: null,
+				token: null
+			}
+		default:
+			return state
+	}
+}
+
+export const AuthProvider = (props) => {
+	const [user, dispatch] = React.useReducer(authReducer, '');
+
+	return(
+		<AuthContext.Provider value={[user, dispatch]}>
+			{props.children}
+		</AuthContext.Provider>
+	)
+}
