@@ -35,7 +35,7 @@ const authReducer = (state, action) => {
 }
 
 export const AuthProvider = (props) => {
-	const [user, dispatch] = React.useReducer(authReducer, '');
+	const [user, dispatch] = React.useReducer(authReducer, initialState);
 
 	return(
 		<AuthContext.Provider value={[user, dispatch]}>
