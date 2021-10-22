@@ -4,8 +4,8 @@ export const AuthContext = React.createContext();
 
 const initialState = {
 	isAuth: false,
-	user: null,
-	token: null
+	user: localStorage.getItem('user'),
+	token: localStorage.getItem('token')
 }
 
 const authReducer = (state, action) => {
@@ -17,7 +17,7 @@ const authReducer = (state, action) => {
 			return {
 				...state,
 				isAuth: true,
-				user: action.payload.user,
+				user: action.payload.userId,
 				token: action.payload.token
 			}
 
@@ -35,7 +35,7 @@ const authReducer = (state, action) => {
 }
 
 export const AuthProvider = (props) => {
-	const [user, dispatch] = React.useReducer(authReducer, '');
+	const [user, dispatch] = React.useReducer(authReducer, initialState);
 
 	return(
 		<AuthContext.Provider value={[user, dispatch]}>

@@ -36,7 +36,7 @@ function Login() {
 				type: 'LOGIN',
 				payload: {
 					token: data.access_token,
-					user: username
+					userId: username
 				}
 			});
 			loginRedirect();	

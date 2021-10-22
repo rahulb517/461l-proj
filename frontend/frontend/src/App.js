@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import Projects from './components/Projects';
 import Resources from './components/Resources';
 import Dashboard from './components/Dashboard';
+import PrivateRoute from './components/PrivateRoute'
 import { AuthProvider } from './AuthContext';
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
 import React from 'react';
@@ -31,18 +32,18 @@ function App() {
 					</Route>
 					<React.Fragment>
 						<Sidebar />
-						<Route path="/dashboard">
+						<PrivateRoute path="/dashboard">
 							<Dashboard />
-						</Route>
-						<Route path="/datasets">
+						</PrivateRoute>
+						<PrivateRoute path="/datasets">
 							<Datasets />
-						</Route>
-						<Route path="/projects">
+						</PrivateRoute>
+						<PrivateRoute path="/projects">
 							<Projects />
-						</Route>
-						<Route path="/resources">
+						</PrivateRoute>
+						<PrivateRoute path="/resources">
 							<Resources />
-						</Route>
+						</PrivateRoute>
 					</React.Fragment>
 					</Switch>
 				</BrowserRouter>
