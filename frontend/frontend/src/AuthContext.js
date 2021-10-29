@@ -11,7 +11,7 @@ const initialState = {
 const authReducer = (state, action) => {
 	switch (action.type) {
 		case 'LOGIN':
-			localStorage.setItem('user', JSON.stringify(action.payload.userId));
+			localStorage.setItem('user', JSON.stringify(action.payload.user));
 			localStorage.setItem('token', JSON.stringify(action.payload.token));
 	
 			return {

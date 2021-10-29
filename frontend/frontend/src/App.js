@@ -35,6 +35,9 @@ function App() {
 						<PrivateRoute path="/dashboard">
 							<Dashboard />
 						</PrivateRoute>
+						<PrivateRoute path="/home">
+							<Dashboard />
+						</PrivateRoute>
 						<PrivateRoute path="/datasets">
 							<Datasets />
 						</PrivateRoute>

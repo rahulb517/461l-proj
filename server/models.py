@@ -19,6 +19,14 @@ class Login(Document):
 	username = StringField()
 	password = StringField()
 
+class Project(Document):
+	meta = {
+        'collection': 'projects'
+    }
+	id = StringField(required=True)
+	name = StringField(required=True)
+	description = StringField(required=True)
+
 class NewLogin(BaseModel):
 	username: str
 	password: str
@@ -30,3 +38,7 @@ class Signup(BaseModel):
 class Token(BaseModel):
 	access_token: str
 	token_type: str
+	
+class NewProject(BaseModel):
+	name: str
+	description: str

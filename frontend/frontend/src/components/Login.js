@@ -45,16 +45,6 @@ function Login() {
 			console.log(err)
 			setVerifyPassword(false);
 		}
-
-		// const fetchResponse = await fetch(`http://localhost:8000/api/login/`, requestOptions);
-		// const data = await fetchResponse.json();
-		// if(fetchResponse.ok) {
-		// 	setVerifyPassword(true);
-		// 	loginRedirect();			
-		// }
-		// if (data.detail === 'Wrong username or password') {
-		// 	setVerifyPassword(false);
-		// }	
 	}
 
 	const history = useHistory();
@@ -64,7 +54,6 @@ function Login() {
 	}
 
 	const renderWrongPasswordError = () => {
-		// console.log(verifyPassword);
 		if (verifyPassword === false) {
 			return(
 				<Grid item xs={12}>
@@ -88,7 +77,6 @@ function Login() {
 				<Grid item xs={12}>
 					<TextField
 						required
-						// id="standard-username-input"
 						label="Username"
 						onInput ={ e => setUsername(e.target.value)}
 					/>
@@ -97,7 +85,6 @@ function Login() {
 				<Grid item xs={12}>
 					<TextField
 						required
-						id="standard-password-input"
 						label="Password"
 						type="password"
 						onInput={ e => setPassword(e.target.value)}

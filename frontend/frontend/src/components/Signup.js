@@ -34,7 +34,7 @@ function CreateAccount() {
 		history.push('/login');
 	}
 	return (
-		<form onSubmit={ handleSubmit } >
+		<form className='login' onSubmit={ handleSubmit } >
 			<Grid container justifyContent="center" spacing={4}>
 				<Grid item xs={12}>
 					<Typography variant="h3">
