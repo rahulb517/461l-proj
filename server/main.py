@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from mongoengine import connect
-from models import Login, Signup, User
+from models import Login, Signup, User, NewProject
 import uvicorn
 import ssl
 import json
