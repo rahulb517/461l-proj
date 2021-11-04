@@ -11,6 +11,11 @@ from passlib.hash import sha256_crypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
+# scraping imports
+import requests
+from bs4 import BeautifulSoup
+import csv
+
 app = FastAPI()
 connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 
@@ -127,6 +132,64 @@ async def get_data() -> dict:
 	for x in HWSet.objects():
 		sets[x['name']] = x.to_json()
 	return sets
+
+
+@app.get('/api/datasets')
+def scrape():
+	URL1 = "https://physionet.org/content/accelerometry-walk-climb-drive/1.0.0/"
+	data1 = parse(URL1)
+	data1.append("https://physionet.org/static/published-projects/accelerometry-walk-climb-drive/labeled-raw-accelerometry-data-captured-during-walking-stair-climbing-and-driving-1.0.0.zip")
+
+	URL2 = "https://physionet.org/content/eda-rest-sedation/1.0/"
+	data2 = parse(URL2)
+	data2.append("https://physionet.org/static/published-projects/eda-rest-sedation/pulse-amplitudes-from-electrodermal-activity-collected-from-healthy-volunteer-subjects-at-rest-and-under-controlled-sedation-1.0.zip")
+
+	URL3 = "https://physionet.org/content/mimic-iv-demo-omop/0.9/"
+	data3 = parse(URL3)
+	data3.append("https://physionet.org/static/published-projects/mimic-iv-demo-omop/mimic-iv-demo-data-in-the-omop-common-data-model-0.9.zip")
+
+	URL4 = "https://physionet.org/content/q-pain/1.0.0/"
+	data4 = parse(URL4)
+	data4.append("https://physionet.org/static/published-projects/q-pain/q-pain-a-question-answering-dataset-to-measure-social-bias-in-pain-management-1.0.0.zip")
+
+	URL5 = "https://physionet.org/content/heart-vector-origin-matlab/1.0.0/"
+	data5 = parse(URL5)
+	data5.append("https://physionet.org/static/published-projects/heart-vector-origin-matlab/heart-vector-origin-point-detection-and-time-coherent-median-beat-construction-1.0.0.zip")
+
+	information = {"accelerometry" : data1, "pulse" : data2, 
+			"MIMIC" : data3, "Q-Pain" : data4,
+			"Heart" : data5}
+
+	return information
+
+	
+
+def parse(URL):
+	r = requests.get(URL)
+	soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
+	table = soup.find('div', attrs = {'class':'col-md-8'})
+
+	arr = []	
+	for row in table:
+		arr.append(row.text)
+
+	data = []
+	for i in range(len(arr)):
+		print(arr[i])
+		if arr[i] == "Abstract":
+			print(arr[i])
+			i += 2
+			data.append(arr[i])
+		if arr[i] == "Background":
+			print(arr[i])
+			i += 2
+			data.append(arr[i])
+			break
+
+	return data
+
+
+
 
 
 if __name__ == '__main__':
