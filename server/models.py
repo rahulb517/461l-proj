@@ -1,6 +1,8 @@
 from mongoengine import Document, StringField, IntField, ListField
+from mongoengine.fields import DictField
 from pydantic import BaseModel
 from mongoengine import connect
+from typing import Optional
 
 class User(Document):
 	meta = {
@@ -24,9 +26,11 @@ class Project(Document):
 	meta = {
         'collection': 'projects'
     }
-	id = StringField(required=True)
+	project_id = StringField(required=True)
+	members = ListField(required=True)
 	name = StringField(required=True)
 	description = StringField(required=True)
+	hardware = DictField()
 
 class NewLogin(BaseModel):
 	username: str
@@ -43,6 +47,18 @@ class Token(BaseModel):
 class NewProject(BaseModel):
 	name: str
 	description: str
+	project_id: str
+	members: list
+	hardware: dict
+
+class UpdatedProject(BaseModel):
+	project_id: str
+	hardware: Optional[dict] = None
+	members: Optional[list] = None
+
+class DeleteProject(BaseModel):
+	project_id: str
+	member: str
 
 class HWSet(Document):
 	meta = {
