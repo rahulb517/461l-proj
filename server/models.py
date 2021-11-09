@@ -2,6 +2,16 @@ from mongoengine import Document, StringField, IntField, ListField
 from pydantic import BaseModel
 from mongoengine import connect
 
+
+class Description(Document):
+	meta = {
+		'collection': 'description',
+	}
+	title = StringField();
+	abstract = StringField()
+	background = StringField()
+	zipUrl = StringField()
+
 class User(Document):
 	meta = {
         'collection': 'users',

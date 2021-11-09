@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from mongoengine import connect
 from mongoengine.connection import disconnect
-from models import Login, Signup, User, HWSet, Transaction
+from models import Login, Signup, User, HWSet, Transaction, Description
 import uvicorn
 import ssl
 import json
@@ -160,9 +160,22 @@ def scrape():
 			"MIMIC" : data3, "Q-Pain" : data4,
 			"Heart" : data5}
 
+	disconnect()
+	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+
+	d = Description(title = "accelerometry", abstract = data1[0], background=data1[1], zipUrl=data1[2])
+	d.save()
+	d = Description(title = "pulse", abstract = data2[0], background=data2[1], zipUrl=data2[2])
+	d.save()
+	d = Description(title = "MIMIC", abstract = data3[0], background=data3[1], zipUrl=data3[2])
+	d.save()
+	d = Description(title = "Q-Pain", abstract = data4[0], background=data4[1], zipUrl=data4[2])
+	d.save()
+	d = Description(title = "Heart", abstract = data5[0], background=data5[1], zipUrl=data5[2])
+	d.save()
+
 	return information
 
-	
 
 def parse(URL):
 	r = requests.get(URL)
@@ -185,6 +198,9 @@ def parse(URL):
 			i += 2
 			data.append(arr[i])
 			break
+
+	
+
 
 	return data
 
