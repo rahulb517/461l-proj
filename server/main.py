@@ -1,9 +1,11 @@
+from re import template
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from mongoengine import connect
 from mongoengine.connection import disconnect
-from models import Login, Signup, User, HWSet, Transaction, Description
+from pydantic.main import prepare_config
+from models import Login, Signup, User, HWSet, Transaction, NewProject, Project, UpdatedProject, DeleteProject, Description
 import uvicorn
 import ssl
 import json
@@ -132,6 +134,130 @@ async def get_data() -> dict:
 	for x in HWSet.objects():
 		sets[x['name']] = x.to_json()
 	return sets
+
+@app.post('/api/projects')
+def projects_create(newProject: NewProject):
+	disconnect()
+	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	if not Project.objects(project_id=newProject.project_id):
+		newProj = Project(name = newProject.name,
+						project_id = newProject.project_id,
+						members = newProject.members,
+						description = newProject.description,
+						)
+		for member in newProj.members:
+			disconnect()
+			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			if not User.objects(username=member):
+				raise HTTPException(status_code=400, detail="Member username doesnt exist")
+			currUser = User.objects(username=member).first()
+			currUser.projects.append(newProj.project_id)
+			currUser.save()
+			disconnect()
+			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			newProj.save()
+		return {'message': 'New project created successfully'}
+	else:
+		raise HTTPException(status_code=400, detail="Project id already exists")
+	
+	
+
+@app.put('/api/projects')
+def project_update(updatedProject: UpdatedProject):
+	disconnect()
+	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	currProject = Project.objects(project_id=updatedProject.project_id).first()
+	if  currProject:
+		if updatedProject.hardware != {}:
+			tempDict = currProject.hardware
+			currDict = currProject.hardware.copy()
+			for k in updatedProject.hardware:
+				x = tempDict.get(k,0)
+				name = k
+				amount = updatedProject.hardware[k]
+				if amount < 0 and -1*amount > x:
+					raise HTTPException(status_code=400, detail="Cannot check in that many resources")
+				tempDict[k] = x+updatedProject.hardware[k]
+			currProject.hardware = tempDict
+			currProject.save()
+			disconnect()
+			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			if amount > 0:
+				data = checkout_HW(name, amount)
+				if data == False:
+					disconnect()
+					connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+					currProject = Project.objects(project_id=updatedProject.project_id).first()
+					currProject.hardware = currDict
+					currProject.save()
+					raise HTTPException(status_code=400, detail="Cannot check out that many resources")
+				else:
+					object = HWSet.objects(name=name)
+					set = object.get(name=name)
+					set["availability"] = data
+					set.save()		
+			else:
+				data = return_HW(name, -1*amount)
+				if data == False:
+					disconnect()
+					connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+					currProject = Project.objects(project_id=updatedProject.project_id).first()
+					currProject.hardware = currDict
+					currProject.save()
+					raise HTTPException(status_code=400, detail="Cannot check in that many resources")
+				else:
+					object = HWSet.objects(name=name)
+					set = object.get(name=name)
+					set["availability"] = data
+					set.save()	
+		elif updatedProject.members != "":
+			# add the project in the user as well 
+			for member in updatedProject.members:
+				currProject.members.append(member)
+			currProject.save()
+		return {'message': 'Project updated successfully'}
+	else:
+		raise HTTPException(status_code=400, detail="Project id doesnt exist")
+
+@app.delete('/api/projects')
+def project_delete(deleteProject: DeleteProject):
+	disconnect()
+	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	currProject = Project.objects(project_id=deleteProject.project_id).first()
+	if  currProject:
+		for member in currProject.members:
+			# find user and delete the project from their hardware set
+			if member == deleteProject.member:
+				currProject.delete()
+				disconnect()
+				connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+				user = User.objects(username=member).first()
+				tempList = user.projects
+				for project in user.projects:
+					if project == currProject.project_id:
+						tempList.remove(project)
+				if not tempList:
+					tempList.append("")
+				user.projects = tempList
+				user.save()
+				# replace hw set resources
+				disconnect()
+				connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+				for k in currProject.hardware:
+					amount = currProject.hardware[k]
+					data = return_HW(k, amount)
+					if data == False:
+						raise HTTPException(status_code=400, detail="Cannot check in that many resources")
+					else:
+						object = HWSet.objects(name=k)
+						set = object.get(name=k)
+						set["availability"] = data
+						set.save()
+				return {'message': 'Project deleted successfully'}
+		raise HTTPException(status_code=400, detail="User doesnt have access to that project")
+		
+	else:
+		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
 
 @app.get('/api/datasets')
