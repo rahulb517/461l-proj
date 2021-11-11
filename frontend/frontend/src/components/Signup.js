@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 
-function CreateAccount() {
+function Signup() {
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	
@@ -70,4 +70,4 @@ function CreateAccount() {
 		</form>
 	)
 }
-export default CreateAccount;
+export default Signup;

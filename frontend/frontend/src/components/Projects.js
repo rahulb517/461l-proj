@@ -2,7 +2,10 @@ import React from 'react';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { AuthContext } from '../AuthContext';
 import { Alert } from '@mui/material';
+import ProjectInfo from './ProjectInfo';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
+const queryClient = new QueryClient()
 
 function Project() {
 	const [joinProjectId, setJoinProjectId] = React.useState('');
@@ -17,11 +20,13 @@ function Project() {
 	async function handleJoinSubmit(e) {
 		e.preventDefault();
 		let payload = {}
-		payload.userId = user.user;
-		payload.joinProjectId = joinProjectId;
+		payload.members = [user.user];
+		payload.project_id = joinProjectId;
+		payload.hardware = {};
+		
 
 		const requestOptions = {
-			method: 'POST',
+			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload)
 		};
@@ -29,7 +34,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`http://localhost:8000/api/join_project/`, requestOptions);
+			const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
@@ -46,11 +51,12 @@ function Project() {
 	async function handleCreateSubmit(e) {
 		e.preventDefault();
 		let payload = {}
-		payload.userId = user.user;
-		payload.hardware = '';
-		payload.createProjectId = createProjectId;
-		payload.createProjectName = createProjectName;
-		payload.createProjectDescription = createProjectDescription;
+		payload.name = createProjectName;
+		payload.description = createProjectDescription;
+		payload.project_id = createProjectId;
+		payload.members = [user.user];
+		payload.hardware = {};
+		
 
 		const requestOptions = {
 			method: 'POST',
@@ -61,7 +67,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`http://localhost:8000/api/create_project/`, requestOptions);
+			const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
@@ -121,6 +127,12 @@ function Project() {
 
 	return (
 		<React.Fragment>
+			<div className='infoCard'>
+				<QueryClientProvider client={queryClient}>
+						<ProjectInfo />
+				</QueryClientProvider>
+			</div>
+
 			<form className='joinProject' onSubmit={ handleJoinSubmit } >
 			<Grid container spacing={4}>
 				<Grid item xs={12}>
