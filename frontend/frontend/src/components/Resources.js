@@ -1,8 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@mui/material';
-import Todos from "./Todos";
-
 function Resources() {
 
 	const [checkIn, setCheckout] = React.useState('');

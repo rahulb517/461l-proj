@@ -44,6 +44,9 @@ def create_access_token(data: dict):
 def get_password_hash(password: str):
 	return sha256_crypt.encrypt(password)
 
+def verify_token(token: str, user: str):
+	decoded_token = jwt.decode(token, JWT_SECRET_KEY)
+	return user == decoded_token['sub']
 
 def authenticate_user(username: str, password: str):
 	try:
@@ -139,6 +142,7 @@ async def get_data() -> dict:
 def projects_create(newProject: NewProject):
 	disconnect()
 	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+
 	if not Project.objects(project_id=newProject.project_id):
 		newProj = Project(name = newProject.name,
 						project_id = newProject.project_id,
