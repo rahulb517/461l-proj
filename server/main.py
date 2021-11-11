@@ -58,17 +58,21 @@ def authenticate_user(username: str, password: str):
 
 def checkout_HW(name: str, amount: int):
 	set = json.loads(HWSet.objects.get(name=name).to_json())
+	if amount < 0:
+		return False
 	if amount <= set['availability']:
 		return set['availability'] - amount
 	else:
-		return False
+		return 0
  
 def return_HW(name: str, amount: int):
 	set = json.loads(HWSet.objects.get(name=name).to_json())
+	if amount < 0:
+		return False
 	if set['availability'] + amount <= set['capacity']:
 		return set['availability'] + amount
 	else:
-		return False
+		return set['capacity']
 
 @app.post('/api/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -104,28 +108,36 @@ async def transaction(transaction: Transaction):
 	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if HWSet.objects(name=transaction.name):
 		if(transaction.type == "checkout"):
-			data = checkout_HW(transaction.name, transaction.amount)
-			if data == False:
-				raise HTTPException(status_code=400, detail="Cannot check out that many resources")
+			avail = checkout_HW(transaction.name, transaction.amount)
+			if avail == False and transaction.amount < 0:
+				raise HTTPException(status_code=400, detail="Invalid Number of Hardware Chosen")
 			else:
 				object = HWSet.objects(name=transaction.name)
 				curSet = json.loads(HWSet.objects(name=transaction.name).to_json())
 				set = object.get(name=transaction.name)
-				set["availability"] = data
+				if transaction.amount > set['availability']:
+					taken = set['availability']
+				else:
+					taken = transaction.amount
+				set["availability"] = avail
 				set.save()		
-				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : data}
+				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : avail, 'checkedOut': taken}
 
 		elif(transaction.type == "checkin"):
-			data = return_HW(transaction.name, transaction.amount)
-			if data == False:
-				raise HTTPException(status_code=400, detail="Cannot check in that many resources")
+			avail = return_HW(transaction.name, transaction.amount)
+			if avail == False and transaction.amount < 0:
+				raise HTTPException(status_code=400, detail="Invalid Number of Hardware Chosen")
 			else:
 				object = HWSet.objects(name=transaction.name)
 				curSet = json.loads(HWSet.objects(name=transaction.name).to_json())
 				set = object.get(name=transaction.name)
-				set["availability"] = data
+				if set['availability'] + transaction.amount <= set['capacity']:
+					given =  transaction.amount
+				else:
+					given = set['capacity'] - set['availability']
+				set["availability"] = avail
 				set.save()		
-				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : data}		
+				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : avail, 'checkedIn': given}		
 
 
 
