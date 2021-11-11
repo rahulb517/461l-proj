@@ -4,8 +4,14 @@ from pydantic import BaseModel
 from mongoengine import connect
 from typing import Optional
 
+connect(db='Users', alias='UsersDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority')
+connect(db='Projects', alias='ProjectsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority')
+connect(db='HWSets', alias='HWSetsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority')
+
+
 class User(Document):
 	meta = {
+		'db_alias': 'UsersDB',
         'collection': 'users',
 		'indexes': [
   			'username'
@@ -24,6 +30,7 @@ class Login(Document):
 
 class Project(Document):
 	meta = {
+		'db_alias': 'ProjectsDB',
         'collection': 'projects'
     }
 	project_id = StringField(required=True)
@@ -62,6 +69,7 @@ class DeleteProject(BaseModel):
 
 class HWSet(Document):
 	meta = {
+		'db_alias': 'HWSetsDB',
 		'collection': 'data',
 		'indexes': [
 			'name',
