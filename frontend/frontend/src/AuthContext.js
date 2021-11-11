@@ -3,7 +3,7 @@ import React from 'react';
 export const AuthContext = React.createContext();
 
 const initialState = {
-	isAuth: false,
+	isAuth: localStorage.getItem('isAuth'),
 	user: localStorage.getItem('user'),
 	token: localStorage.getItem('token')
 }
@@ -11,8 +11,9 @@ const initialState = {
 const authReducer = (state, action) => {
 	switch (action.type) {
 		case 'LOGIN':
-			localStorage.setItem('user', JSON.stringify(action.payload.user));
+			localStorage.setItem('user', JSON.stringify(action.payload.userId));
 			localStorage.setItem('token', JSON.stringify(action.payload.token));
+			localStorage.setItem('isAuth', true);
 	
 			return {
 				...state,

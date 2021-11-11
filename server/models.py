@@ -7,7 +7,18 @@ from typing import Optional
 connect(db='Users', alias='UsersDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority')
 connect(db='Projects', alias='ProjectsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority')
 connect(db='HWSets', alias='HWSetsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority')
+connect(db='Description', alias='DescriptionDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority')
 
+
+class Description(Document):
+	meta = {
+		'db_alias': 'DescriptionDB',
+		'collection': 'description',
+	}
+	title = StringField();
+	abstract = StringField()
+	background = StringField()
+	zipUrl = StringField()
 
 class User(Document):
 	meta = {

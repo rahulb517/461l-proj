@@ -7,9 +7,10 @@ import Sidebar from './components/Sidebar';
 import Projects from './components/Projects';
 import Resources from './components/Resources';
 import Dashboard from './components/Dashboard';
+import Logout from './components/Logout'
 import PrivateRoute from './components/PrivateRoute'
 import { AuthProvider } from './AuthContext';
-import { BrowserRouter, Route, Switch} from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import React from 'react';
 import './App.css';
 
@@ -30,24 +31,34 @@ function App() {
 					<Route path="/login">
 						<Login />
 					</Route>
-					<React.Fragment>
-						<Sidebar />
+					{/* <React.Fragment> */}
+						{/* <Sidebar /> */}
 						<PrivateRoute path="/dashboard">
+							<Sidebar />
 							<Dashboard />
 						</PrivateRoute>
 						<PrivateRoute path="/home">
+							<Sidebar />
 							<Dashboard />
 						</PrivateRoute>
 						<PrivateRoute path="/datasets">
+							<Sidebar />
 							<Datasets />
 						</PrivateRoute>
 						<PrivateRoute path="/projects">
+							<Sidebar />
 							<Projects />
 						</PrivateRoute>
 						<PrivateRoute path="/resources">
+							<Sidebar />
 							<Resources />
 						</PrivateRoute>
-					</React.Fragment>
+						<PrivateRoute path="/logout">
+							<Sidebar />
+							<Logout />
+						</PrivateRoute>
+					{/* </React.Fragment> */}
+					<Redirect to="/"/>
 					</Switch>
 				</BrowserRouter>
 			</div>

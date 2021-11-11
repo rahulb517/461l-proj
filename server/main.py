@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from mongoengine import connect
 from mongoengine.connection import disconnect
 from pydantic.main import prepare_config
-from models import Login, Signup, User, HWSet, Transaction, NewProject, Project, UpdatedProject, DeleteProject
+from models import Login, Signup, User, HWSet, Transaction, NewProject, Project, UpdatedProject, DeleteProject, Description
 import uvicorn
 import ssl
 import json
@@ -46,6 +46,9 @@ def create_access_token(data: dict):
 def get_password_hash(password: str):
 	return sha256_crypt.encrypt(password)
 
+def verify_token(token: str, user: str):
+	decoded_token = jwt.decode(token, JWT_SECRET_KEY)
+	return user == decoded_token['sub']
 
 def authenticate_user(username: str, password: str):
 	try:
@@ -57,17 +60,21 @@ def authenticate_user(username: str, password: str):
 
 def checkout_HW(name: str, amount: int):
 	set = json.loads(HWSet.objects.get(name=name).to_json())
+	if amount < 0:
+		return False
 	if amount <= set['availability']:
 		return set['availability'] - amount
 	else:
-		return False
+		return 0
  
 def return_HW(name: str, amount: int):
 	set = json.loads(HWSet.objects.get(name=name).to_json())
+	if amount < 0:
+		return False
 	if set['availability'] + amount <= set['capacity']:
 		return set['availability'] + amount
 	else:
-		return False
+		return set['capacity']
 
 @app.post('/api/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -103,28 +110,36 @@ async def transaction(transaction: Transaction):
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if HWSet.objects(name=transaction.name):
 		if(transaction.type == "checkout"):
-			data = checkout_HW(transaction.name, transaction.amount)
-			if data == False:
-				raise HTTPException(status_code=400, detail="Cannot check out that many resources")
+			avail = checkout_HW(transaction.name, transaction.amount)
+			if avail == False and transaction.amount < 0:
+				raise HTTPException(status_code=400, detail="Invalid Number of Hardware Chosen")
 			else:
 				object = HWSet.objects(name=transaction.name)
 				curSet = json.loads(HWSet.objects(name=transaction.name).to_json())
 				set = object.get(name=transaction.name)
-				set["availability"] = data
+				if transaction.amount > set['availability']:
+					taken = set['availability']
+				else:
+					taken = transaction.amount
+				set["availability"] = avail
 				set.save()		
-				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : data}
+				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : avail, 'checkedOut': taken}
 
 		elif(transaction.type == "checkin"):
-			data = return_HW(transaction.name, transaction.amount)
-			if data == False:
-				raise HTTPException(status_code=400, detail="Cannot check in that many resources")
+			avail = return_HW(transaction.name, transaction.amount)
+			if avail == False and transaction.amount < 0:
+				raise HTTPException(status_code=400, detail="Invalid Number of Hardware Chosen")
 			else:
 				object = HWSet.objects(name=transaction.name)
 				curSet = json.loads(HWSet.objects(name=transaction.name).to_json())
 				set = object.get(name=transaction.name)
-				set["availability"] = data
+				if set['availability'] + transaction.amount <= set['capacity']:
+					given =  transaction.amount
+				else:
+					given = set['capacity'] - set['availability']
+				set["availability"] = avail
 				set.save()		
-				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : data}		
+				return {'name' : transaction.name, 'capacity': curSet[0]['capacity'], 'availability' : avail, 'checkedIn': given}		
 
 
 
@@ -295,9 +310,22 @@ def scrape():
 			"MIMIC" : data3, "Q-Pain" : data4,
 			"Heart" : data5}
 
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+
+	d = Description(title = "accelerometry", abstract = data1[0], background=data1[1], zipUrl=data1[2])
+	d.save()
+	d = Description(title = "pulse", abstract = data2[0], background=data2[1], zipUrl=data2[2])
+	d.save()
+	d = Description(title = "MIMIC", abstract = data3[0], background=data3[1], zipUrl=data3[2])
+	d.save()
+	d = Description(title = "Q-Pain", abstract = data4[0], background=data4[1], zipUrl=data4[2])
+	d.save()
+	d = Description(title = "Heart", abstract = data5[0], background=data5[1], zipUrl=data5[2])
+	d.save()
+
 	return information
 
-	
 
 def parse(URL):
 	r = requests.get(URL)
@@ -320,6 +348,9 @@ def parse(URL):
 			i += 2
 			data.append(arr[i])
 			break
+
+	
+
 
 	return data
 

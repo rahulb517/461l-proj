@@ -1,5 +1,6 @@
 import React from 'react';
 import { AiOutlineHome, AiOutlineProject, AiOutlineCloudServer } from 'react-icons/ai';
+import { BiLogOut } from "react-icons/bi";
 import { BsFiles } from 'react-icons/bs'
 
 export const SidebarRoutes = [
@@ -29,6 +30,12 @@ export const SidebarRoutes = [
 		title: 'Datasets',
 		route: '/datasets',
 		icon: <BsFiles />,
+		className: 'nav-text'
+	},
+	{
+		title: 'Logout',
+		route: '/logout',
+		icon: <BiLogOut />,
 		className: 'nav-text'
 	},
 ]
