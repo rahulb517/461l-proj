@@ -16,7 +16,7 @@ function Resources() {
 	const [resourceList, setResourceList] = React.useState([]);
 	const [projectSelected, setProjectSelected] = React.useState('');
 	const [resourceSelected, setResourceSelected] = React.useState('');
-	const [validCheckout, setValidCheckout] = React.useState('');
+	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
 
 
@@ -31,7 +31,8 @@ function Resources() {
 
 	React.useEffect(() => {
 		async function fetchData() {
-			const projFetchResponse = await fetch(`http://localhost:8000/api/projects/${user.user}`);
+			let userId = user.user.replace(/["]+/g, '')
+			const projFetchResponse = await fetch(`http://localhost:8000/api/projects/${userId}`);
 			const resourceFetchResponse = await fetch('http://localhost:8000/api/resources');
 			const projData = await projFetchResponse.json();
 			const resourceData = await resourceFetchResponse.json();
@@ -56,31 +57,65 @@ function Resources() {
 			body: JSON.stringify(payload)
 		};
 		if (actionType === 'checkout') {
-			let checkoutPayload = {}
-			checkoutPayload.hardware = {resourceSelected: quantity}
-			const checkoutRequestOptions = {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(payload)
-			}
 			try {
 				const fetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}
-				setValidCheckout(true);
+				if(data.availability === 0) {
+					setValidTransaction('Incomplete checkout')
+				}
+				else{
+					setValidTransaction('Complete checkout');
+				}
+				let projCheckoutPayload = {}
+				projCheckoutPayload.project_id = projectSelected;
+				projCheckoutPayload.hardware = {[resourceSelected]: data.checkedOut};
+
+				const checkoutRequestOptions = {
+					method: 'PUT',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(projCheckoutPayload)
+				}
+				console.log(projCheckoutPayload)
+				const projFetchResponse = await fetch('http://localhost:8000/api/projects/', checkoutRequestOptions)
+
 			} catch(err) {
 				console.log(err);
-				setValidCheckout(false);
+				setValidTransaction('Invalid checkout');
 			}
+		}
 
+		else if (actionType === 'checkin') {
+			try {
+				let projCheckinPayload = {}
+				projCheckinPayload.project_id = projectSelected;
+				projCheckinPayload.hardware = {[resourceSelected]: (-1) * quantity};
+
+				const checkinRequestOptions = {
+					method: 'PUT',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(projCheckinPayload)
+				}
+				const fetchResponse = await fetch('http://localhost:8000/api/projects/', checkinRequestOptions)
+				const data = await fetchResponse.json()
+				if(!fetchResponse.ok){
+					throw data.detail;
+				}
+				setValidTransaction('Valid checkin');
+				const resourcesFetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
+
+			} catch(err) {
+				console.log(err);
+				setValidTransaction('Invalid checkin');
+			}
 		}
 		
 	}
 
-	const renderCheckoutStatus = () => {
-		if (validCheckout === true) {
+	const renderTransactionStatus = () => {
+		if (validTransaction === 'Complete checkout' || validTransaction === 'Valid checkin') {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="success">
@@ -90,11 +125,31 @@ function Resources() {
 			)
 		}
 
-		else if (validCheckout === false) {
+		if (validTransaction === 'Incomplete checkout') {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="success">
+						This request may not have been completely fulfilled
+					</Alert>
+				</Grid>
+			)
+		}
+
+		else if (validTransaction === 'Invalid checkout') {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Cannot fulfill this request fully
+						Something went wrong
+					</Alert>
+				</Grid>
+			)
+		}
+
+		else if (validTransaction === 'Invalid checkin') {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="error">
+						Cannot check in that many resources
 					</Alert>
 				</Grid>
 			)
@@ -140,7 +195,7 @@ function Resources() {
 						/>
 					</Grid>
 
-					{renderCheckoutStatus()}
+					{renderTransactionStatus()}
 
 					<Grid item xs={6}>
 						<Button type="submit"

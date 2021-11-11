@@ -6,7 +6,8 @@ import { AuthContext } from '../AuthContext';
 function ProjectInfo() {
 	const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projects', async () => {
-		const fetchResponse = await fetch(`http://localhost:8000/api/projects/${user.user}`);
+		let userId = user.user.replace(/["]+/g, '')
+		const fetchResponse = await fetch(`http://localhost:8000/api/projects/${userId}`);
 		return await fetchResponse.json();
 	}, {
 		staleTime: 1000,
