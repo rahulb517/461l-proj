@@ -26,7 +26,7 @@ function Login() {
 		};
 
 		try {
-			const fetchResponse = await fetch(`http://localhost:8000/api/login`, requestOptions);
+			const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/login`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
