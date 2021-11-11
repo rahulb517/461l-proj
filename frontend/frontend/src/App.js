@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import Projects from './components/Projects';
 import Resources from './components/Resources';
 import Dashboard from './components/Dashboard';
+import Logout from './components/Logout'
 import PrivateRoute from './components/PrivateRoute'
 import { AuthProvider } from './AuthContext';
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
@@ -46,6 +47,9 @@ function App() {
 						</PrivateRoute>
 						<PrivateRoute path="/resources">
 							<Resources />
+						</PrivateRoute>
+						<PrivateRoute path="/logout">
+							<Logout />
 						</PrivateRoute>
 					</React.Fragment>
 					</Switch>
