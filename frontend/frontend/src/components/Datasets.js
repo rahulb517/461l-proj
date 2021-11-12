@@ -1,21 +1,33 @@
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Grid } from '@mui/material';
 import { IoIosArrowDropdown } from 'react-icons/io';
 import { AuthContext } from '../AuthContext'
 import React from 'react';
+import { useQuery } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import DatasetInfo1 from './DatasetInfo1'
 
+
+const queryClient = new QueryClient()
 function Datasets() {
+
 	const [user, dispatch] = React.useContext(AuthContext)
 	console.log(user);
+
 	return (
 		<div className='datasets'>
 			<h1>{user.user}</h1>
+			<QueryClientProvider client={queryClient}>
+							<DatasetInfo1/>
+						</QueryClientProvider>
 			<Accordion>
 					<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
 						Labeled raw accelerometry data captured during walking, stair climbing and driving https://physionet.org/content/accelerometry-walk-climb-drive/1.0.0/
 					</AccordionSummary>
 					<AccordionDetails>
 						{/* Download button */}
-						Webscrape abstract and background
+						{/* <QueryClientProvider client={queryClient}>
+							<DatasetInfo1/>
+						</QueryClientProvider> */}
 					</AccordionDetails>
 			</Accordion>
 			<Accordion>

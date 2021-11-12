@@ -150,6 +150,7 @@ async def get_data() -> dict:
 	sets = {}
 	for x in HWSet.objects():
 		sets[x['name']] = x.to_json()
+	print(sets)
 	return sets
 
 @app.get('/api/projects/{userId}')
@@ -299,41 +300,43 @@ def project_delete(deleteProject: DeleteProject):
 def scrape():
 	URL1 = "https://physionet.org/content/accelerometry-walk-climb-drive/1.0.0/"
 	data1 = parse(URL1)
-	data1.append("https://physionet.org/static/published-projects/accelerometry-walk-climb-drive/labeled-raw-accelerometry-data-captured-during-walking-stair-climbing-and-driving-1.0.0.zip")
+	data1['url'] = "https://physionet.org/static/published-projects/accelerometry-walk-climb-drive/labeled-raw-accelerometry-data-captured-during-walking-stair-climbing-and-driving-1.0.0.zip"
 
 	URL2 = "https://physionet.org/content/eda-rest-sedation/1.0/"
 	data2 = parse(URL2)
-	data2.append("https://physionet.org/static/published-projects/eda-rest-sedation/pulse-amplitudes-from-electrodermal-activity-collected-from-healthy-volunteer-subjects-at-rest-and-under-controlled-sedation-1.0.zip")
+	data2['url'] = "https://physionet.org/static/published-projects/eda-rest-sedation/pulse-amplitudes-from-electrodermal-activity-collected-from-healthy-volunteer-subjects-at-rest-and-under-controlled-sedation-1.0.zip"
 
 	URL3 = "https://physionet.org/content/mimic-iv-demo-omop/0.9/"
 	data3 = parse(URL3)
-	data3.append("https://physionet.org/static/published-projects/mimic-iv-demo-omop/mimic-iv-demo-data-in-the-omop-common-data-model-0.9.zip")
+	data3['url'] = "https://physionet.org/static/published-projects/mimic-iv-demo-omop/mimic-iv-demo-data-in-the-omop-common-data-model-0.9.zip"
 
 	URL4 = "https://physionet.org/content/q-pain/1.0.0/"
 	data4 = parse(URL4)
-	data4.append("https://physionet.org/static/published-projects/q-pain/q-pain-a-question-answering-dataset-to-measure-social-bias-in-pain-management-1.0.0.zip")
+	data4['url'] = "https://physionet.org/static/published-projects/q-pain/q-pain-a-question-answering-dataset-to-measure-social-bias-in-pain-management-1.0.0.zip"
 
 	URL5 = "https://physionet.org/content/heart-vector-origin-matlab/1.0.0/"
 	data5 = parse(URL5)
-	data5.append("https://physionet.org/static/published-projects/heart-vector-origin-matlab/heart-vector-origin-point-detection-and-time-coherent-median-beat-construction-1.0.0.zip")
+	data5['url'] = "https://physionet.org/static/published-projects/heart-vector-origin-matlab/heart-vector-origin-point-detection-and-time-coherent-median-beat-construction-1.0.0.zip"
 
 	information = {"accelerometry" : data1, "pulse" : data2, 
 			"MIMIC" : data3, "Q-Pain" : data4,
 			"Heart" : data5}
 
-	# disconnect()
-	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	#print(information)
 
-	d = Description(title = "accelerometry", abstract = data1[0], background=data1[1], zipUrl=data1[2])
-	d.save()
-	d = Description(title = "pulse", abstract = data2[0], background=data2[1], zipUrl=data2[2])
-	d.save()
-	d = Description(title = "MIMIC", abstract = data3[0], background=data3[1], zipUrl=data3[2])
-	d.save()
-	d = Description(title = "Q-Pain", abstract = data4[0], background=data4[1], zipUrl=data4[2])
-	d.save()
-	d = Description(title = "Heart", abstract = data5[0], background=data5[1], zipUrl=data5[2])
-	d.save()
+	#disconnect()
+	#connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+
+	# d = Description(title = "accelerometry", abstract = data1[0], background=data1[1], zipUrl=data1[2])
+	# d.save()
+	# d = Description(title = "pulse", abstract = data2[0], background=data2[1], zipUrl=data2[2])
+	# d.save()
+	# d = Description(title = "MIMIC", abstract = data3[0], background=data3[1], zipUrl=data3[2])
+	# d.save()
+	# d = Description(title = "Q-Pain", abstract = data4[0], background=data4[1], zipUrl=data4[2])
+	# d.save()
+	# d = Description(title = "Heart", abstract = data5[0], background=data5[1], zipUrl=data5[2])
+	# d.save()
 
 	return information
 
@@ -347,17 +350,17 @@ def parse(URL):
 	for row in table:
 		arr.append(row.text)
 
-	data = []
+	data = {}
 	for i in range(len(arr)):
-		print(arr[i])
+		#print(arr[i])
 		if arr[i] == "Abstract":
-			print(arr[i])
+			#print(arr[i])
 			i += 2
-			data.append(arr[i])
+			data['abstract'] = arr[i]
 		if arr[i] == "Background":
-			print(arr[i])
+			#print(arr[i])
 			i += 2
-			data.append(arr[i])
+			data['background'] = arr[i]
 			break
 
 	
