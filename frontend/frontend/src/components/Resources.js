@@ -19,7 +19,6 @@ function Resources() {
 	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
 
-
 	const projectOptions = [];
 	for (const project of projectList) {
 		projectOptions.push({value: project, label: project})
@@ -32,8 +31,8 @@ function Resources() {
 	React.useEffect(() => {
 		async function fetchData() {
 			let userId = user.user.replace(/["]+/g, '')
-			const projFetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/projects/${userId}`);
-			const resourceFetchResponse = await fetch('https://limitless-dusk-43236.herokuapp.com/api/resources');
+			const projFetchResponse = await fetch(`http://localhost:8000/api/projects/${userId}`);
+			const resourceFetchResponse = await fetch('http://localhost:8000/api/resources');
 			const projData = await projFetchResponse.json();
 			const resourceData = await resourceFetchResponse.json();
 			setResourceList(Object.keys(resourceData));
@@ -58,7 +57,7 @@ function Resources() {
 		};
 		if (actionType === 'checkout') {
 			try {
-				const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/resources/`, requestOptions);
+				const fetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
@@ -79,7 +78,7 @@ function Resources() {
 					body: JSON.stringify(projCheckoutPayload)
 				}
 				console.log(projCheckoutPayload)
-				const projFetchResponse = await fetch('https://limitless-dusk-43236.herokuapp.com/api/projects/', checkoutRequestOptions)
+				const projFetchResponse = await fetch('http://localhost:8000/api/projects/', checkoutRequestOptions)
 
 			} catch(err) {
 				console.log(err);
@@ -98,13 +97,13 @@ function Resources() {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(projCheckinPayload)
 				}
-				const fetchResponse = await fetch('https://limitless-dusk-43236.herokuapp.com/api/projects/', checkinRequestOptions)
+				const fetchResponse = await fetch('http://localhost:8000/api/projects/', checkinRequestOptions)
 				const data = await fetchResponse.json()
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}
 				setValidTransaction('Valid checkin');
-				const resourcesFetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/resources/`, requestOptions);
+				const resourcesFetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
 
 			} catch(err) {
 				console.log(err);

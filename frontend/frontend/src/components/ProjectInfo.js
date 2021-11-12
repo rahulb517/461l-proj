@@ -7,7 +7,7 @@ function ProjectInfo() {
 	const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projects', async () => {
 		let userId = user.user.replace(/["]+/g, '')
-		const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/projects/${userId}`);
+		const fetchResponse = await fetch(`http://localhost:8000/api/projects/${userId}`);
 		return await fetchResponse.json();
 	}, {
 		staleTime: 1000,

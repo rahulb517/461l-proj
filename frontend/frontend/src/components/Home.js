@@ -52,7 +52,7 @@ function Home() {
 				</Stack>
 			</div>
 			<div className='Info'>
-				<p>YOU ARE HOME MOTHERFUCKER</p>
+				<h1>Welcome to Daintree</h1>
 			</div>
 		</div>
 	)

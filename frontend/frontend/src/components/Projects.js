@@ -34,7 +34,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/projects/`, requestOptions);
+			const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
@@ -67,7 +67,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/projects/`, requestOptions);
+			const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
