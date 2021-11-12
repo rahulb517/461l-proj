@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import { Button, Grid, Paper } from '@mui/material';
 
 const fetchDatasets = async () => {
-	const fetchResponse = await fetch(`http://localhost:8000/api/datasets`);
+	const fetchResponse = await fetch(`https://dreamteam461l.com/api/datasets`);
 	return await fetchResponse.json();
 }
 
@@ -18,8 +18,8 @@ return(
         <Paper >
             <Grid justifyContent="center" alignItems="center" container spacing={4}>
                 <Grid item xs={12}>
-                    <p>Abstract: {data.pulse.abstract}</p>
-                    <p>Background: {data.pulse.background}</p>
+                    <p> <b>Abstract: </b>{data.pulse.abstract}</p>
+                    <p> <b>Background: </b>{data.pulse.background}</p>
                     <Button href= {data.pulse.url}>Download</Button>
                 </Grid>
             </Grid>

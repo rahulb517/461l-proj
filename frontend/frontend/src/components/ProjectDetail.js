@@ -7,7 +7,7 @@ function ProjectDetail(){
     const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projectdetails', async () => {
 		let userId = user.user.replace(/["]+/g, '')
-		const fetchResponse = await fetch(`http://localhost:8000/api/projects/hardware/${userId}`);
+		const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/hardware/${userId}`);
 		return await fetchResponse.json();
 	}, {
 		staleTime: 1000,
