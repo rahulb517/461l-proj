@@ -15,12 +15,13 @@ function Project() {
 	const [user, dispatch] = React.useContext(AuthContext);
 	const [validCreateId, setValidCreateId] = React.useState(null);
 	const [validJoinId, setValidJoinId] = React.useState(null);
+	const [errorMessage, setErrorMessage] = React.useState('');
 
 
 	async function handleJoinSubmit(e) {
 		e.preventDefault();
 		let payload = {}
-		payload.members = [user.user];
+		payload.members = [user.user.replace(/["]+/g, '')];
 		payload.project_id = joinProjectId;
 		payload.hardware = {};
 		
@@ -44,6 +45,7 @@ function Project() {
 		} catch (err) {
 			console.log(err);
 			setValidJoinId(false);
+			setErrorMessage(err);
 		}
 		
 	}
@@ -54,7 +56,7 @@ function Project() {
 		payload.name = createProjectName;
 		payload.description = createProjectDescription;
 		payload.project_id = createProjectId;
-		payload.members = [user.user];
+		payload.members = [user.user.replace(/["]+/g, '')];
 		payload.hardware = {};
 		
 
@@ -77,6 +79,7 @@ function Project() {
 		} catch (err) {
 			console.log(err);
 			setValidCreateId(false);
+			setErrorMessage(err);
 		}
 		
 	}
@@ -95,7 +98,7 @@ function Project() {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Project Id already exists
+						{errorMessage}
 					</Alert>
 				</Grid>
 			)
@@ -117,7 +120,7 @@ function Project() {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Project Id does not exist
+						{errorMessage}
 					</Alert>
 				</Grid>
 			)

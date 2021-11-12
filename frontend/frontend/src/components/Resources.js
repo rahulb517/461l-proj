@@ -18,6 +18,7 @@ function Resources() {
 	const [resourceSelected, setResourceSelected] = React.useState('');
 	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
+	const [errorMessage, setErrorMessage] = React.useState('');
 
 	const projectOptions = [];
 	for (const project of projectList) {
@@ -44,20 +45,21 @@ function Resources() {
 	
 	async function handleSubmit(e){
 		e.preventDefault();
-		let payload = {}
-		payload.name = resourceSelected;
-		payload.amount = quantity;
-		payload.type = actionType;
-		console.log(payload);
-
-		const requestOptions = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(payload)
-		};
+	
 		if (actionType === 'checkout') {
 			try {
-				const fetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
+				let projCheckoutPayload = {}
+				projCheckoutPayload.project_id = projectSelected;
+				projCheckoutPayload.type = actionType;
+				projCheckoutPayload.hardware = {[resourceSelected]: quantity};
+
+				const requestOptions = {
+					method: 'PUT',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(projCheckoutPayload)
+				};
+
+				const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
@@ -68,21 +70,12 @@ function Resources() {
 				else{
 					setValidTransaction('Complete checkout');
 				}
-				let projCheckoutPayload = {}
-				projCheckoutPayload.project_id = projectSelected;
-				projCheckoutPayload.hardware = {[resourceSelected]: data.checkedOut};
-
-				const checkoutRequestOptions = {
-					method: 'PUT',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(projCheckoutPayload)
-				}
-				console.log(projCheckoutPayload)
-				const projFetchResponse = await fetch('http://localhost:8000/api/projects/', checkoutRequestOptions)
 
 			} catch(err) {
 				console.log(err);
 				setValidTransaction('Invalid checkout');
+				setErrorMessage(err);
+				console.log(errorMessage);
 			}
 		}
 
@@ -90,7 +83,8 @@ function Resources() {
 			try {
 				let projCheckinPayload = {}
 				projCheckinPayload.project_id = projectSelected;
-				projCheckinPayload.hardware = {[resourceSelected]: (-1) * quantity};
+				projCheckinPayload.type = actionType;
+				projCheckinPayload.hardware = {[resourceSelected]: quantity};
 
 				const checkinRequestOptions = {
 					method: 'PUT',
@@ -103,11 +97,12 @@ function Resources() {
 					throw data.detail;
 				}
 				setValidTransaction('Valid checkin');
-				const resourcesFetchResponse = await fetch(`http://localhost:8000/api/resources/`, requestOptions);
 
 			} catch(err) {
 				console.log(err);
 				setValidTransaction('Invalid checkin');
+				setErrorMessage(err);
+				console.log(errorMessage);
 			}
 		}
 		
@@ -138,7 +133,7 @@ function Resources() {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Something went wrong
+						{errorMessage}
 					</Alert>
 				</Grid>
 			)

@@ -205,6 +205,7 @@ def project_update(updatedProject: UpdatedProject):
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	currProject = Project.objects(project_id=updatedProject.project_id).first()
 	if  currProject:
+		flag = True
 		if updatedProject.hardware != {}:
 			tempDict = currProject.hardware
 			currDict = currProject.hardware.copy()
@@ -212,16 +213,28 @@ def project_update(updatedProject: UpdatedProject):
 				x = tempDict.get(k,0)
 				name = k
 				amount = updatedProject.hardware[k]
-				if amount < 0 and -1*amount > x:
-					raise HTTPException(status_code=400, detail="Cannot check in that many resources")
-				tempDict[k] = x+updatedProject.hardware[k]
+				if amount < 0:
+					raise HTTPException(status_code=400, detail="Invalid amount")
+				set = json.loads(HWSet.objects.get(name=name).to_json())
+				if amount > set['availability']:
+					if updatedProject.type == "checkout":
+						amount = set['availability']
+						flag = False
+					else:
+						raise HTTPException(status_code=400, detail="Invalid amount")
+				if updatedProject.type == "checkin" and amount > x:
+					raise HTTPException(status_code=400, detail="Invalid amount")
+				if updatedProject.type == "checkout":
+					tempDict[k] = x+amount
+				else:
+					tempDict[k] = x-amount
 			currProject.hardware = tempDict
 			currProject.save()
 			# disconnect()
 			# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
-			if amount > 0:
+			if updatedProject.type == "checkout":
 				data = checkout_HW(name, amount)
-				if data == False:
+				if data == False and data < 0:
 					# disconnect()
 					# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 					currProject = Project.objects(project_id=updatedProject.project_id).first()
@@ -234,8 +247,8 @@ def project_update(updatedProject: UpdatedProject):
 					set["availability"] = data
 					set.save()		
 			else:
-				data = return_HW(name, -1*amount)
-				if data == False:
+				data = return_HW(name, amount)
+				if data == False and data < 0:
 					# disconnect()
 					# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 					currProject = Project.objects(project_id=updatedProject.project_id).first()
@@ -250,10 +263,19 @@ def project_update(updatedProject: UpdatedProject):
 		elif updatedProject.members != "":
 			# add the project in the user as well 
 			for member in updatedProject.members:
+				for mem in currProject.members:
+					if member == mem:
+						raise HTTPException(status_code=400, detail="User id already has access to this project")
 				userproj = User.objects(username=member).first()
-				userproj.projects.append(updatedProject.project_id)
-				userproj.save()
-		return {'message': 'Project updated successfully'}
+				currProject.members.append(member)
+			currProject.save()
+			userproj.projects.append(updatedProject.project_id)
+			userproj.save()
+
+		if flag == True:
+			return {'message': 'Full request successful'}
+		else:
+			return {'message': 'Partial request successful'}
 	else:
 		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
