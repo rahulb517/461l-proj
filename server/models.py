@@ -71,6 +71,7 @@ class NewProject(BaseModel):
 
 class UpdatedProject(BaseModel):
 	project_id: str
+	type: Optional[str] = None
 	hardware: Optional[dict] = None
 	members: Optional[list] = None
 
