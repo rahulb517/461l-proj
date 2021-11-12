@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://limitless-dusk-43236.herokuapp.com/",
+  "proxy": "http://localhost:8000/",
   "dependencies": {
     "@chakra-ui/core": "^0.8.0",
     "@emotion/react": "^11.4.1",

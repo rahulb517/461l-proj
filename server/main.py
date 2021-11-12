@@ -191,6 +191,7 @@ def project_update(updatedProject: UpdatedProject):
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	currProject = Project.objects(project_id=updatedProject.project_id).first()
 	if  currProject:
+		flag = True
 		if updatedProject.hardware != {}:
 			tempDict = currProject.hardware
 			currDict = currProject.hardware.copy()
@@ -204,9 +205,15 @@ def project_update(updatedProject: UpdatedProject):
 				if amount > set['availability']:
 					if updatedProject.type == "checkout":
 						amount = set['availability']
+						flag = False
 					else:
 						raise HTTPException(status_code=400, detail="Invalid amount")
-				tempDict[k] = x+amount
+				if updatedProject.type == "checkin" and amount > x:
+					raise HTTPException(status_code=400, detail="Invalid amount")
+				if updatedProject.type == "checkout":
+					tempDict[k] = x+amount
+				else:
+					tempDict[k] = x-amount
 			currProject.hardware = tempDict
 			currProject.save()
 			# disconnect()
@@ -250,7 +257,11 @@ def project_update(updatedProject: UpdatedProject):
 			currProject.save()
 			userproj.projects.append(updatedProject.project_id)
 			userproj.save()
-		return {'message': 'Project updated successfully'}
+
+		if flag == True:
+			return {'message': 'Full request successful'}
+		else:
+			return {'message': 'Partial request successful'}
 	else:
 		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
