@@ -18,7 +18,7 @@ function Signup() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(myJSON)
 		};
-		const fetchResponse = await fetch(`http://localhost:8000/api/signup/`, requestOptions);
+		const fetchResponse = await fetch(`https://dreamteam461l.com/api/signup/`, requestOptions);
 		const data = await fetchResponse.json();
 		if(fetchResponse.ok) {
 			loginRedirect();			

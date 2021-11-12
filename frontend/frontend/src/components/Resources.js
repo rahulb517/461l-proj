@@ -32,8 +32,8 @@ function Resources() {
 	React.useEffect(() => {
 		async function fetchData() {
 			let userId = user.user.replace(/["]+/g, '')
-			const projFetchResponse = await fetch(`http://localhost:8000/api/projects/${userId}`);
-			const resourceFetchResponse = await fetch('http://localhost:8000/api/resources');
+			const projFetchResponse = await fetch(`https://dreamteam461l.com/api/projects/${userId}`);
+			const resourceFetchResponse = await fetch('https://dreamteam461l.com/api/resources');
 			const projData = await projFetchResponse.json();
 			const resourceData = await resourceFetchResponse.json();
 			setResourceList(Object.keys(resourceData));
@@ -59,7 +59,7 @@ function Resources() {
 					body: JSON.stringify(projCheckoutPayload)
 				};
 
-				const fetchResponse = await fetch(`http://localhost:8000/api/projects/`, requestOptions);
+				const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
@@ -91,7 +91,7 @@ function Resources() {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(projCheckinPayload)
 				}
-				const fetchResponse = await fetch('http://localhost:8000/api/projects/', checkinRequestOptions)
+				const fetchResponse = await fetch('https://dreamteam461l.com/api/projects/', checkinRequestOptions)
 				const data = await fetchResponse.json()
 				if(!fetchResponse.ok){
 					throw data.detail;
