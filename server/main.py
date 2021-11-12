@@ -214,16 +214,16 @@ def project_update(updatedProject: UpdatedProject):
 				name = k
 				amount = updatedProject.hardware[k]
 				if amount < 0:
-					raise HTTPException(status_code=400, detail="Invalid amount")
+					raise HTTPException(status_code=400, detail="Invalid amount 1")
 				set = json.loads(HWSet.objects.get(name=name).to_json())
 				if amount > set['availability']:
 					if updatedProject.type == "checkout":
 						amount = set['availability']
 						flag = False
-					else:
-						raise HTTPException(status_code=400, detail="Invalid amount")
+					# else:
+					# 	raise HTTPException(status_code=400, detail="Invalid amount 2")
 				if updatedProject.type == "checkin" and amount > x:
-					raise HTTPException(status_code=400, detail="Invalid amount")
+					raise HTTPException(status_code=400, detail="Invalid amount 3")
 				if updatedProject.type == "checkout":
 					tempDict[k] = x+amount
 				else:
