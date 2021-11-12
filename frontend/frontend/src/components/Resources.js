@@ -19,6 +19,7 @@ function Resources() {
 	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
 	const [errorMessage, setErrorMessage] = React.useState('');
+	const [successMessage, setSuccessMessage] = React.useState('');
 
 	const projectOptions = [];
 	for (const project of projectList) {
@@ -64,13 +65,15 @@ function Resources() {
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}
-				if(data.availability === 0) {
-					setValidTransaction('Incomplete checkout')
-				}
-				else{
+				if(data.message === "Full request successful") {
 					setValidTransaction('Complete checkout');
+					setSuccessMessage(data.message);
 				}
-
+				else if(data.message === "Partial request successful") {
+					setValidTransaction('Incomplete checkout');
+					setSuccessMessage(data.message);
+				}
+				
 			} catch(err) {
 				console.log(err);
 				setValidTransaction('Invalid checkout');
@@ -109,7 +112,17 @@ function Resources() {
 	}
 
 	const renderTransactionStatus = () => {
-		if (validTransaction === 'Complete checkout' || validTransaction === 'Valid checkin') {
+		if (validTransaction === 'Complete checkout' || validTransaction === 'Incomplete checkout') {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="success">
+						{successMessage}
+					</Alert>
+				</Grid>
+			)
+		}
+
+		if (validTransaction === 'Valid checkin') {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="success">
@@ -143,7 +156,7 @@ function Resources() {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Cannot check in that many resources
+						{errorMessage}
 					</Alert>
 				</Grid>
 			)
@@ -185,7 +198,7 @@ function Resources() {
 							required
 							type="number"
 							label="Quantity"
-							onChange ={ e => setQuantity(Math.abs(e.target.value))}
+							onChange ={ e => setQuantity(parseInt(e.target.value))}
 						/>
 					</Grid>
 
