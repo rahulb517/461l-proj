@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 
-function CreateAccount() {
+function Signup() {
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	
@@ -18,7 +18,7 @@ function CreateAccount() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(myJSON)
 		};
-		const fetchResponse = await fetch(`http://localhost:8000/api/signup/`, requestOptions);
+		const fetchResponse = await fetch(`https://limitless-dusk-43236.herokuapp.com/api/signup/`, requestOptions);
 		const data = await fetchResponse.json();
 		if(fetchResponse.ok) {
 			loginRedirect();			
@@ -70,4 +70,4 @@ function CreateAccount() {
 		</form>
 	)
 }
-export default CreateAccount;
+export default Signup;

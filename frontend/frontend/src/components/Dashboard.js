@@ -1,7 +1,24 @@
+import ResourceInfo from "./ResourceInfo";
+import ProjectInfo from "./ProjectInfo";
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
+import { Grid } from '@mui/material';
+
+const queryClient = new QueryClient()
+
 function Dashboard() {
 	return(
 		<div className='internalPage'>
-			<h1>Dashboard</h1>
+			<Grid justifyContent="center" alignItems="center" container spacing={8}>
+				<Grid item xs={12}>
+					<h1>Dashboard</h1>
+				</Grid>
+				<QueryClientProvider client={queryClient}>
+					<ResourceInfo />
+					<ProjectInfo />
+					<ReactQueryDevtools initialIsOpen={false} />
+				</QueryClientProvider>
+			</Grid>
 		</div>
 	)
 }

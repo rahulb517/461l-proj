@@ -12,6 +12,7 @@ import json
 from passlib.hash import sha256_crypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+import os
 
 # scraping imports
 import requests
@@ -24,6 +25,7 @@ connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?ret
 
 origins = [
     "http://localhost:3000",
+	'*'
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -76,8 +78,8 @@ def return_HW(name: str, amount: int):
 
 @app.post('/api/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	username = form_data.username
 	password = form_data.password
 
@@ -91,8 +93,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @app.post('/api/signup')
 def signup(signupData: Signup):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if not User.objects(username=signupData.username):
 		newUser = User(username = signupData.username,
 						password = get_password_hash(signupData.password)
@@ -104,8 +106,8 @@ def signup(signupData: Signup):
 
 @app.post('/api/resources')
 async def transaction(transaction: Transaction):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if HWSet.objects(name=transaction.name):
 		if(transaction.type == "checkout"):
 			avail = checkout_HW(transaction.name, transaction.amount)
@@ -143,18 +145,23 @@ async def transaction(transaction: Transaction):
 
 @app.get('/api/resources')
 async def get_data() -> dict:
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	sets = {}
 	for x in HWSet.objects():
 		sets[x['name']] = x.to_json()
 	return sets
 
+@app.get('/api/projects/{userId}')
+async def get_projects(userId: str):
+	currUser = User.objects(username=userId).first()
+	return {'projects': currUser.projects}
+
+
 @app.post('/api/projects')
 def projects_create(newProject: NewProject):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
-
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if not Project.objects(project_id=newProject.project_id):
 		newProj = Project(name = newProject.name,
 						project_id = newProject.project_id,
@@ -162,15 +169,15 @@ def projects_create(newProject: NewProject):
 						description = newProject.description,
 						)
 		for member in newProj.members:
-			disconnect()
-			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			# disconnect()
+			# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 			if not User.objects(username=member):
 				raise HTTPException(status_code=400, detail="Member username doesnt exist")
 			currUser = User.objects(username=member).first()
 			currUser.projects.append(newProj.project_id)
 			currUser.save()
-			disconnect()
-			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			# disconnect()
+			# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 			newProj.save()
 		return {'message': 'New project created successfully'}
 	else:
@@ -180,8 +187,8 @@ def projects_create(newProject: NewProject):
 
 @app.put('/api/projects')
 def project_update(updatedProject: UpdatedProject):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	currProject = Project.objects(project_id=updatedProject.project_id).first()
 	if  currProject:
 		if updatedProject.hardware != {}:
@@ -196,13 +203,13 @@ def project_update(updatedProject: UpdatedProject):
 				tempDict[k] = x+updatedProject.hardware[k]
 			currProject.hardware = tempDict
 			currProject.save()
-			disconnect()
-			connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+			# disconnect()
+			# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 			if amount > 0:
 				data = checkout_HW(name, amount)
 				if data == False:
-					disconnect()
-					connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+					# disconnect()
+					# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 					currProject = Project.objects(project_id=updatedProject.project_id).first()
 					currProject.hardware = currDict
 					currProject.save()
@@ -215,8 +222,8 @@ def project_update(updatedProject: UpdatedProject):
 			else:
 				data = return_HW(name, -1*amount)
 				if data == False:
-					disconnect()
-					connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+					# disconnect()
+					# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 					currProject = Project.objects(project_id=updatedProject.project_id).first()
 					currProject.hardware = currDict
 					currProject.save()
@@ -229,24 +236,25 @@ def project_update(updatedProject: UpdatedProject):
 		elif updatedProject.members != "":
 			# add the project in the user as well 
 			for member in updatedProject.members:
-				currProject.members.append(member)
-			currProject.save()
+				userproj = User.objects(username=member).first()
+				userproj.projects.append(updatedProject.project_id)
+				userproj.save()
 		return {'message': 'Project updated successfully'}
 	else:
 		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
 @app.delete('/api/projects')
 def project_delete(deleteProject: DeleteProject):
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	currProject = Project.objects(project_id=deleteProject.project_id).first()
 	if  currProject:
 		for member in currProject.members:
 			# find user and delete the project from their hardware set
 			if member == deleteProject.member:
 				currProject.delete()
-				disconnect()
-				connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+				# disconnect()
+				# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 				user = User.objects(username=member).first()
 				tempList = user.projects
 				for project in user.projects:
@@ -257,8 +265,8 @@ def project_delete(deleteProject: DeleteProject):
 				user.projects = tempList
 				user.save()
 				# replace hw set resources
-				disconnect()
-				connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+				# disconnect()
+				# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 				for k in currProject.hardware:
 					amount = currProject.hardware[k]
 					data = return_HW(k, amount)
@@ -302,8 +310,8 @@ def scrape():
 			"MIMIC" : data3, "Q-Pain" : data4,
 			"Heart" : data5}
 
-	disconnect()
-	connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	# disconnect()
+	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 
 	d = Description(title = "accelerometry", abstract = data1[0], background=data1[1], zipUrl=data1[2])
 	d.save()
@@ -351,4 +359,5 @@ def parse(URL):
 
 
 if __name__ == '__main__':
-	uvicorn.run(app)
+	port = int(os.environ.get("PORT", 5000))
+	uvicorn.run(app, host='0.0.0.0', port=port)
