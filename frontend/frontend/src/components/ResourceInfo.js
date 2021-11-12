@@ -3,7 +3,7 @@ import { Alert, Grid, Paper } from '@mui/material';
 
 
 const fetchHardwareData = async () => {
-	const fetchResponse = await fetch(`https://dreamteam461l.com/api/resources/`);
+	const fetchResponse = await fetch(`/api/resources`);
 	return await fetchResponse.json();
 }
 

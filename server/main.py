@@ -13,6 +13,7 @@ from passlib.hash import sha256_crypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import os
+from fastapi.staticfiles import StaticFiles
 
 # scraping imports
 import requests
@@ -105,7 +106,7 @@ def signup(signupData: Signup):
 		raise HTTPException(status_code=400, detail="User already exists")
 
 @app.post('/api/resources')
-async def transaction(transaction: Transaction):
+def transaction(transaction: Transaction):
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if HWSet.objects(name=transaction.name):
@@ -144,7 +145,7 @@ async def transaction(transaction: Transaction):
 
 
 @app.get('/api/resources')
-async def get_data() -> dict:
+def get_data() -> dict:
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	sets = {}
@@ -153,12 +154,12 @@ async def get_data() -> dict:
 	return sets
 
 @app.get('/api/projects/{userId}')
-async def get_projects(userId: str):
+def get_projects(userId: str):
 	currUser = User.objects(username=userId).first()
 	return {'projects': currUser.projects}
 
 @app.get('/api/projects/hardware/{userId}')
-async def get_projects_detail(userId: str):
+def get_projects_detail(userId: str):
 	currUser = User.objects(username=userId).first()
 	projects = []
 	for project in currUser.projects:
@@ -393,7 +394,7 @@ def parse(URL):
 
 
 
-
+app.mount("/", StaticFiles(directory="build", html=True), name="static")
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))

@@ -35,7 +35,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/`, requestOptions);
+			const fetchResponse = await fetch(`/api/projects`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
@@ -69,7 +69,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/`, requestOptions);
+			const fetchResponse = await fetch(`/api/projects`, requestOptions);
 			const data = await fetchResponse.json();
 			if(!fetchResponse.ok){
 				throw data.detail;
