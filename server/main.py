@@ -157,6 +157,20 @@ async def get_projects(userId: str):
 	currUser = User.objects(username=userId).first()
 	return {'projects': currUser.projects}
 
+@app.get('/api/projects/hardware/{userId}')
+async def get_projects_detail(userId: str):
+	currUser = User.objects(username=userId).first()
+	projects = []
+	for project in currUser.projects:
+		currProject = Project.objects(project_id=project).first()
+		entry = {
+			"project_id": currProject.project_id, 
+			"members": currProject.members, 
+			"name": currProject.name, 
+			"description": currProject.description, 
+			"hardware": currProject.hardware}
+		projects.append(entry)
+	return {'projectdetails': projects}
 
 @app.post('/api/projects')
 def projects_create(newProject: NewProject):

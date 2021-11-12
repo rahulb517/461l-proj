@@ -1,5 +1,6 @@
 import ResourceInfo from "./ResourceInfo";
 import ProjectInfo from "./ProjectInfo";
+import ProjectDetail from "./ProjectDetail"
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { Grid } from '@mui/material';
@@ -15,7 +16,7 @@ function Dashboard() {
 				</Grid>
 				<QueryClientProvider client={queryClient}>
 					<ResourceInfo />
-					<ProjectInfo />
+					<ProjectDetail />
 					<ReactQueryDevtools initialIsOpen={false} />
 				</QueryClientProvider>
 			</Grid>

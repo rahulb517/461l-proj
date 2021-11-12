@@ -20,7 +20,6 @@ function Resources() {
 	const [actionType, setActionType] = React.useState('');
 	const [errorMessage, setErrorMessage] = React.useState('');
 
-
 	const projectOptions = [];
 	for (const project of projectList) {
 		projectOptions.push({value: project, label: project})
