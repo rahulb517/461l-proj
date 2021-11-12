@@ -18,10 +18,12 @@ function Datasets() {
 
 	return (
 		<div className='datasets'>
-			<h1>{user.user}</h1>
+			<h1>Datasets</h1>
 			<Accordion>
 				<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
-					Labeled raw accelerometry data captured during walking, stair climbing and driving
+					<b>
+						Labeled raw accelerometry data captured during walking, stair climbing and driving
+					</b>
 				</AccordionSummary>
 				<AccordionDetails>
 					<QueryClientProvider client={queryClient}>
@@ -31,7 +33,9 @@ function Datasets() {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
-					Pulse Amplitudes from electrodermal activity collected from healthy volunteer subjects at rest and under controlled sedation
+					<b>
+						Pulse Amplitudes from electrodermal activity collected from healthy volunteer subjects at rest and under controlled sedation
+					</b>
 				</AccordionSummary>
 				<AccordionDetails>
 				<QueryClientProvider client={queryClient}>
@@ -41,7 +45,9 @@ function Datasets() {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
-					MIMIC-IV demo data in the OMOP Common Data Model
+					<b>
+						MIMIC-IV demo data in the OMOP Common Data Model
+					</b>
 				</AccordionSummary>
 				<AccordionDetails>
 				<QueryClientProvider client={queryClient}>
@@ -51,7 +57,9 @@ function Datasets() {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
-					Q-Pain: A Question Answering Dataset to Measure Social Bias in Pain Management
+					<b>
+						Q-Pain: A Question Answering Dataset to Measure Social Bias in Pain Management
+					</b>
 				</AccordionSummary>
 				<AccordionDetails>
 				<QueryClientProvider client={queryClient}>
@@ -61,7 +69,9 @@ function Datasets() {
 			</Accordion>
 			<Accordion>
 				<AccordionSummary expandIcon={<IoIosArrowDropdown />}>
-					Heart Vector Origin Point Detection and Time-Coherent Median Beat Construction
+					<b>
+						Heart Vector Origin Point Detection and Time-Coherent Median Beat Construction
+					</b>
 				</AccordionSummary>
 				<AccordionDetails>
 				<QueryClientProvider client={queryClient}>

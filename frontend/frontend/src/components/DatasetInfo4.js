@@ -18,8 +18,8 @@ return(
         <Paper >
             <Grid justifyContent="center" alignItems="center" container spacing={4}>
                 <Grid item xs={12}>
-                    <p>Abstract: {data.Pain.abstract}</p>
-                    <p>Background: {data.Pain.background}</p>
+                    <p> <b>Abstract: </b>{data.Pain.abstract}</p>
+                    <p> <b>Background: </b>{data.Pain.background}</p>
                     <Button href= {data.Pain.url}>Download</Button>
                 </Grid>
             </Grid>
