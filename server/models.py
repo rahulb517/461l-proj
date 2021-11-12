@@ -3,11 +3,12 @@ from mongoengine.fields import DictField
 from pydantic import BaseModel
 from mongoengine import connect
 from typing import Optional
+import ssl
 
-connect(db='Users', alias='UsersDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority')
-connect(db='Projects', alias='ProjectsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority')
-connect(db='HWSets', alias='HWSetsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority')
-connect(db='Description', alias='DescriptionDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority')
+connect(db='Users', alias='UsersDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Users?retryWrites=true&w=majority' , ssl_cert_reqs=ssl.CERT_NONE)
+connect(db='Projects', alias='ProjectsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority' , ssl_cert_reqs=ssl.CERT_NONE)
+connect(db='HWSets', alias='HWSetsDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority' , ssl_cert_reqs=ssl.CERT_NONE)
+connect(db='Description', alias='DescriptionDB', host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Description?retryWrites=true&w=majority' , ssl_cert_reqs=ssl.CERT_NONE)
 
 
 class Description(Document):
@@ -15,7 +16,7 @@ class Description(Document):
 		'db_alias': 'DescriptionDB',
 		'collection': 'description',
 	}
-	title = StringField();
+	title = StringField()
 	abstract = StringField()
 	background = StringField()
 	zipUrl = StringField()
