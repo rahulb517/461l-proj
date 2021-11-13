@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import { Button, Grid, Paper } from '@mui/material';
 
 const fetchDatasets = async () => {
-	const fetchResponse = await fetch(`/api/datasets`);
+	const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/datasets`);
 	return await fetchResponse.json();
 }
 

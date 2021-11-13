@@ -204,6 +204,9 @@ def projects_create(newProject: NewProject):
 def project_update(updatedProject: UpdatedProject):
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	for k in updatedProject.hardware:
+		if k == 'noHardware':
+			raise HTTPException(status_code=400, detail="Choose a HW set")
 	currProject = Project.objects(project_id=updatedProject.project_id).first()
 	if  currProject:
 		flag = True
@@ -394,7 +397,7 @@ def parse(URL):
 
 
 
-app.mount("/", StaticFiles(directory="build", html=True), name="static")
+# app.mount("/", StaticFiles(directory="build", html=True), name="static")
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))

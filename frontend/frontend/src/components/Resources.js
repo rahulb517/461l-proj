@@ -15,7 +15,7 @@ function Resources() {
 	const [projectList, setProjectList] = React.useState([]);
 	const [resourceList, setResourceList] = React.useState([]);
 	const [projectSelected, setProjectSelected] = React.useState('');
-	const [resourceSelected, setResourceSelected] = React.useState('');
+	const [resourceSelected, setResourceSelected] = React.useState('noHardware');
 	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
 	const [errorMessage, setErrorMessage] = React.useState('');
@@ -33,8 +33,8 @@ function Resources() {
 	React.useEffect(() => {
 		async function fetchData() {
 			let userId = user.user.replace(/["]+/g, '')
-			const projFetchResponse = await fetch(`/api/projects/${userId}`);
-			const resourceFetchResponse = await fetch('/api/resources');
+			const projFetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects/${userId}`);
+			const resourceFetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/resources');
 			const projData = await projFetchResponse.json();
 			const resourceData = await resourceFetchResponse.json();
 			setResourceList(Object.keys(resourceData));
@@ -60,7 +60,7 @@ function Resources() {
 					body: JSON.stringify(projCheckoutPayload)
 				};
 
-				const fetchResponse = await fetch(`/api/projects`, requestOptions);
+				const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
@@ -94,7 +94,7 @@ function Resources() {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(projCheckinPayload)
 				}
-				const fetchResponse = await fetch('/api/projects', checkinRequestOptions)
+				const fetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/projects', checkinRequestOptions)
 				const data = await fetchResponse.json()
 				if(!fetchResponse.ok){
 					throw data.detail;
