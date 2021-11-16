@@ -7,7 +7,7 @@ function ProjectInfo() {
 	const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projects', async () => {
 		let userId = user.user.replace(/["]+/g, '')
-		const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/${userId}`);
+		const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects/${userId}`);
 		return await fetchResponse.json();
 	}, {
 		staleTime: 1000,

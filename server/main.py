@@ -13,6 +13,7 @@ from passlib.hash import sha256_crypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import os
+from fastapi.staticfiles import StaticFiles
 
 # scraping imports
 import requests
@@ -105,7 +106,7 @@ def signup(signupData: Signup):
 		raise HTTPException(status_code=400, detail="User already exists")
 
 @app.post('/api/resources')
-async def transaction(transaction: Transaction):
+def transaction(transaction: Transaction):
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	if HWSet.objects(name=transaction.name):
@@ -144,7 +145,7 @@ async def transaction(transaction: Transaction):
 
 
 @app.get('/api/resources')
-async def get_data() -> dict:
+def get_data() -> dict:
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/HWSets?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
 	sets = {}
@@ -153,12 +154,12 @@ async def get_data() -> dict:
 	return sets
 
 @app.get('/api/projects/{userId}')
-async def get_projects(userId: str):
+def get_projects(userId: str):
 	currUser = User.objects(username=userId).first()
 	return {'projects': currUser.projects}
 
 @app.get('/api/projects/hardware/{userId}')
-async def get_projects_detail(userId: str):
+def get_projects_detail(userId: str):
 	currUser = User.objects(username=userId).first()
 	projects = []
 	for project in currUser.projects:
@@ -203,6 +204,9 @@ def projects_create(newProject: NewProject):
 def project_update(updatedProject: UpdatedProject):
 	# disconnect()
 	# connect(host='mongodb+srv://admin:adminPass@cluster0.ikk67.mongodb.net/Projects?retryWrites=true&w=majority', ssl_cert_reqs=ssl.CERT_NONE)
+	for k in updatedProject.hardware:
+		if k == 'noHardware':
+			raise HTTPException(status_code=400, detail="Choose a HW set")
 	currProject = Project.objects(project_id=updatedProject.project_id).first()
 	if  currProject:
 		flag = True
@@ -214,7 +218,7 @@ def project_update(updatedProject: UpdatedProject):
 				name = k
 				amount = updatedProject.hardware[k]
 				if amount < 0:
-					raise HTTPException(status_code=400, detail="Invalid amount 1")
+					raise HTTPException(status_code=400, detail="Invalid amount")
 				set = json.loads(HWSet.objects.get(name=name).to_json())
 				if amount > set['availability']:
 					if updatedProject.type == "checkout":
@@ -223,7 +227,7 @@ def project_update(updatedProject: UpdatedProject):
 					# else:
 					# 	raise HTTPException(status_code=400, detail="Invalid amount 2")
 				if updatedProject.type == "checkin" and amount > x:
-					raise HTTPException(status_code=400, detail="Invalid amount 3")
+					raise HTTPException(status_code=400, detail="Invalid amount")
 				if updatedProject.type == "checkout":
 					tempDict[k] = x+amount
 				else:
@@ -393,7 +397,7 @@ def parse(URL):
 
 
 
-
+# app.mount("/", StaticFiles(directory="build", html=True), name="static")
 
 if __name__ == '__main__':
 	port = int(os.environ.get("PORT", 5000))

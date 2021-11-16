@@ -15,10 +15,11 @@ function Resources() {
 	const [projectList, setProjectList] = React.useState([]);
 	const [resourceList, setResourceList] = React.useState([]);
 	const [projectSelected, setProjectSelected] = React.useState('');
-	const [resourceSelected, setResourceSelected] = React.useState('');
+	const [resourceSelected, setResourceSelected] = React.useState('noHardware');
 	const [validTransaction, setValidTransaction] = React.useState('');
 	const [actionType, setActionType] = React.useState('');
 	const [errorMessage, setErrorMessage] = React.useState('');
+	const [successMessage, setSuccessMessage] = React.useState('');
 
 	const projectOptions = [];
 	for (const project of projectList) {
@@ -32,8 +33,8 @@ function Resources() {
 	React.useEffect(() => {
 		async function fetchData() {
 			let userId = user.user.replace(/["]+/g, '')
-			const projFetchResponse = await fetch(`https://dreamteam461l.com/api/projects/${userId}`);
-			const resourceFetchResponse = await fetch('https://dreamteam461l.com/api/resources');
+			const projFetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects/${userId}`);
+			const resourceFetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/resources');
 			const projData = await projFetchResponse.json();
 			const resourceData = await resourceFetchResponse.json();
 			setResourceList(Object.keys(resourceData));
@@ -59,18 +60,20 @@ function Resources() {
 					body: JSON.stringify(projCheckoutPayload)
 				};
 
-				const fetchResponse = await fetch(`https://dreamteam461l.com/api/projects/`, requestOptions);
+				const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects`, requestOptions);
 				const data = await fetchResponse.json();
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}
-				if(data.availability === 0) {
-					setValidTransaction('Incomplete checkout')
-				}
-				else{
+				if(data.message === "Full request successful") {
 					setValidTransaction('Complete checkout');
+					setSuccessMessage(data.message);
 				}
-
+				else if(data.message === "Partial request successful") {
+					setValidTransaction('Incomplete checkout');
+					setSuccessMessage(data.message);
+				}
+				
 			} catch(err) {
 				console.log(err);
 				setValidTransaction('Invalid checkout');
@@ -91,7 +94,7 @@ function Resources() {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(projCheckinPayload)
 				}
-				const fetchResponse = await fetch('https://dreamteam461l.com/api/projects/', checkinRequestOptions)
+				const fetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/projects', checkinRequestOptions)
 				const data = await fetchResponse.json()
 				if(!fetchResponse.ok){
 					throw data.detail;
@@ -109,7 +112,17 @@ function Resources() {
 	}
 
 	const renderTransactionStatus = () => {
-		if (validTransaction === 'Complete checkout' || validTransaction === 'Valid checkin') {
+		if (validTransaction === 'Complete checkout' || validTransaction === 'Incomplete checkout') {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="success">
+						{successMessage}
+					</Alert>
+				</Grid>
+			)
+		}
+
+		if (validTransaction === 'Valid checkin') {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="success">
@@ -143,7 +156,7 @@ function Resources() {
 			return(
 				<Grid item xs={12}>
 					<Alert severity="error">
-						Cannot check in that many resources
+						{errorMessage}
 					</Alert>
 				</Grid>
 			)
@@ -185,7 +198,7 @@ function Resources() {
 							required
 							type="number"
 							label="Quantity"
-							onChange ={ e => setQuantity(Math.abs(e.target.value))}
+							onChange ={ e => setQuantity(parseInt(e.target.value))}
 						/>
 					</Grid>
 
