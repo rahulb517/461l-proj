@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@mui/material';
+import { postFetch } from '../utils/utils';
 
 function Signup() {
 	const [username, setUsername] = React.useState('');
@@ -18,8 +19,7 @@ function Signup() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(myJSON)
 		};
-		const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/signup`, requestOptions);
-		const data = await fetchResponse.json();
+		const [fetchResponse, data] = await postFetch('/signup', requestOptions);
 		if(fetchResponse.ok) {
 			loginRedirect();			
 		}

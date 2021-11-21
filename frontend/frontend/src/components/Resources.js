@@ -5,6 +5,7 @@ import ResourceInfo from './ResourceInfo';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Select from 'react-select';
 import { AuthContext } from '../AuthContext';
+import { getFetch, putFetch } from '../utils/utils';
 
 
 
@@ -32,11 +33,9 @@ function Resources() {
 
 	React.useEffect(() => {
 		async function fetchData() {
-			let userId = user.user.replace(/["]+/g, '')
-			const projFetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects/${userId}`);
-			const resourceFetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/resources');
-			const projData = await projFetchResponse.json();
-			const resourceData = await resourceFetchResponse.json();
+			let userId = user.user.replace(/["]+/g, '');
+			const projData = await getFetch(`/projects/${userId}`);
+			const resourceData = await getFetch('/resources');
 			setResourceList(Object.keys(resourceData));
 			console.log(Object.keys(resourceData))
 			setProjectList(projData['projects']);
@@ -60,8 +59,8 @@ function Resources() {
 					body: JSON.stringify(projCheckoutPayload)
 				};
 
-				const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects`, requestOptions);
-				const data = await fetchResponse.json();
+				const [fetchResponse, data] = await putFetch('/projects', requestOptions);
+				console.log(data);
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}
@@ -94,8 +93,7 @@ function Resources() {
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(projCheckinPayload)
 				}
-				const fetchResponse = await fetch('https://warm-scrubland-04074.herokuapp.com/api/projects', checkinRequestOptions)
-				const data = await fetchResponse.json()
+				const [fetchResponse, data] = await putFetch('/projects', checkinRequestOptions);
 				if(!fetchResponse.ok){
 					throw data.detail;
 				}

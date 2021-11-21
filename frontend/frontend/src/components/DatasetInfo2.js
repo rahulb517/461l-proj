@@ -1,9 +1,10 @@
 import { useQuery } from 'react-query';
 import { Button, Grid, Paper } from '@mui/material';
+import { getFetch } from '../utils/utils';
 
 const fetchDatasets = async () => {
-	const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/datasets`);
-	return await fetchResponse.json();
+	const datasetsData = await getFetch('/datasets');
+	return datasetsData;
 }
 
 function DatasetInfo2() {

@@ -4,6 +4,7 @@ import { AuthContext } from '../AuthContext';
 import { Alert } from '@mui/material';
 import ProjectInfo from './ProjectInfo';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { postFetch, putFetch } from '../utils/utils';
 
 const queryClient = new QueryClient()
 
@@ -35,8 +36,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects`, requestOptions);
-			const data = await fetchResponse.json();
+			const [fetchResponse, data] = await putFetch('/projects', requestOptions);
 			if(!fetchResponse.ok){
 				throw data.detail;
 			}
@@ -69,8 +69,7 @@ function Project() {
 		console.log(payload);
 
 		try {
-			const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects`, requestOptions);
-			const data = await fetchResponse.json();
+			const [fetchResponse, data] = await postFetch('/projects', requestOptions);
 			if(!fetchResponse.ok){
 				throw data.detail;
 			}

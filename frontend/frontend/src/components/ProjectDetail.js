@@ -2,13 +2,14 @@ import React from 'react';
 import { useQuery } from 'react-query'
 import { Alert, Grid, Paper, Accordion, AccordionDetails, AccordionSummary, Typography} from '@mui/material';
 import { AuthContext } from '../AuthContext';
+import { getFetch } from '../utils/utils';
 
 function ProjectDetail(){
     const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projectdetails', async () => {
 		let userId = user.user.replace(/["]+/g, '')
-		const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/projects/hardware/${userId}`);
-		return await fetchResponse.json();
+		const projectDetailData = await getFetch(`/projects/hardware/${userId}`);
+		return projectDetailData;
 	}, {
 		staleTime: 1000,
 		//placeholderData: { HWSet1: "{\"_id\": {\"$oid\": \"617ba4a3885d8944d1b2961a\"}, \"name\": \"HWSet1\", \"capacity\": 200, \"availability\": 200}", HWSet2: "{\"_id\": {\"$oid\": \"617ba4e26c2b00b199b0b081\"}, \"name\": \"HWSet2\", \"capacity\": 200, \"availability\": 200}" },

@@ -1,24 +1,45 @@
 import { useQuery } from 'react-query'
 import { Alert, Grid, Paper } from '@mui/material';
+import { getFetch } from '../utils/utils';
 
 
 const fetchHardwareData = async () => {
-	const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/resources`);
-	return await fetchResponse.json();
+	const hardwareData = await getFetch('/resources');
+	return hardwareData;
 }
 
 function ResourceInfo() {
 	const {data, status} = useQuery('hardware', fetchHardwareData, {
 		staleTime: 2000,
-		//placeholderData: { HWSet1: "{\"_id\": {\"$oid\": \"617ba4a3885d8944d1b2961a\"}, \"name\": \"HWSet1\", \"capacity\": 200, \"availability\": 200}", HWSet2: "{\"_id\": {\"$oid\": \"617ba4e26c2b00b199b0b081\"}, \"name\": \"HWSet2\", \"capacity\": 200, \"availability\": 200}" },
 	});
 	console.log(data)
+
+	function renderHardwareData() {
+		let hardwareSets = [];
+		for(let key of Object.keys(data)) {	
+			hardwareSets.push(
+				<Grid key={key} item xs={6}>
+					<Paper >
+						<Grid justifyContent="center" alignItems="center" container spacing={4}>
+							<Grid item xs={12}>
+								<h3>{JSON.parse(data[key])['name']}</h3>
+								<p>Capactity: {JSON.parse(data[key])['capacity']}</p>
+								<p>Availability: {JSON.parse(data[key])['availability']}</p>
+							</Grid>
+						</Grid>
+					</Paper>
+				</Grid>
+			);
+		}
+		return hardwareSets;
+	}
 
 	return (
 		<>
 			{status === 'success' && (
 				<>
-					<Grid item xs={6}>
+					{renderHardwareData()}
+					{/* <Grid item xs={6}>
 						<Paper >
 							<Grid justifyContent="center" alignItems="center" container spacing={4}>
 								<Grid item xs={12}>
@@ -39,7 +60,7 @@ function ResourceInfo() {
 								</Grid>
 							</Grid>
 						</Paper>
-					</Grid>
+					</Grid> */}
 				</>
 			)}
 			{status === 'error' && (

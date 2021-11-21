@@ -3,7 +3,8 @@ import { useHistory } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { Alert } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../AuthContext'
+import { AuthContext } from '../AuthContext';
+import { postFetch } from '../utils/utils';
 
 function Login() {	
 	const [user, dispatch] = React.useContext(AuthContext)
@@ -26,8 +27,7 @@ function Login() {
 		};
 
 		try {
-			const fetchResponse = await fetch(`https://warm-scrubland-04074.herokuapp.com/api/login`, requestOptions);
-			const data = await fetchResponse.json();
+			const [fetchResponse, data] = await postFetch('/login', requestOptions);
 			if(!fetchResponse.ok){
 				throw data.detail;
 			}
