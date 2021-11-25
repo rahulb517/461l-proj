@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 
 # scraping imports
 import requests
-# from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 import csv
 
 app = FastAPI()
