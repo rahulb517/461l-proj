@@ -80,6 +80,10 @@ class DeleteProject(BaseModel):
 	project_id: str
 	member: str
 
+class NewHwset(BaseModel):
+	name: str
+	capacity: int
+
 class HWSet(Document):
 	meta = {
 		'db_alias': 'HWSetsDB',
