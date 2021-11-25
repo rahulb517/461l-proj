@@ -374,6 +374,7 @@ def hwset_create(newHw: NewHwset):
 						capacity = newHw.capacity,
 						availability = newHw.capacity)
 		newHw.save()
+		return {'message': 'New hardware set created successfully'}
 	else:	
 		raise HTTPException(status_code=400, detail="Hardware name already exists") 
 
