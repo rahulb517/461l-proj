@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from mongoengine import connect
 from mongoengine.connection import disconnect
 from pydantic.main import prepare_config
-from models import Login, Signup, User, HWSet, Transaction, NewProject, Project, UpdatedProject, DeleteProject, Description
+from models import Login, Signup, User, HWSet, Transaction, NewProject, Project, UpdatedProject, DeleteProject, Description, NewHwset
 import uvicorn
 import ssl
 import json
@@ -367,6 +367,16 @@ def scrape():
 
 	return information
 
+@app.post('/api/hwset')
+def hwset_create(newHw: NewHwset):
+	if not HWSet.objects(name=newHw.name):
+		newHw = HWSet(name = newHw.name,
+						capacity = newHw.capacity,
+						availability = newHw.capacity)
+		newHw.save()
+		return {'message': 'New hardware set created successfully'}
+	else:	
+		raise HTTPException(status_code=400, detail="Hardware name already exists") 
 
 def parse(URL):
 	r = requests.get(URL)
