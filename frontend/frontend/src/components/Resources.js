@@ -1,11 +1,12 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import {Alert, Button, Grid, Input, TextField, Typography } from '@mui/material';
+import {Alert, Button, Grid, Fab, Input, TextField, Typography } from '@mui/material';
+import { GrAdd } from "react-icons/gr";
 import ResourceInfo from './ResourceInfo';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Select from 'react-select';
 import { AuthContext } from '../AuthContext';
-import { getFetch, putFetch } from '../utils/utils';
+import { getFetch, postFetch, putFetch } from '../utils/utils';
 
 
 
@@ -21,6 +22,10 @@ function Resources() {
 	const [actionType, setActionType] = React.useState('');
 	const [errorMessage, setErrorMessage] = React.useState('');
 	const [successMessage, setSuccessMessage] = React.useState('');
+	const [addHardwareClicked, setAddHardwareClicked] = React.useState(false);
+	const [hardwareName, setHardwareName] = React.useState('');
+	const [capacity, setCapacity] = React.useState('');
+	const [validHardwareName, setValidHardwareName] = React.useState('');
 
 	const projectOptions = [];
 	for (const project of projectList) {
@@ -42,6 +47,34 @@ function Resources() {
 		}
 		fetchData();
 	}, []);
+
+	function handleAddClick(){
+		setAddHardwareClicked(true);
+	}
+
+	async function handleCreateResource(e) {
+		e.preventDefault();
+		let payload = {};
+		payload.capacity = capacity;
+		payload.name = hardwareName;
+
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		};
+
+		try {
+			const [fetchResponse, data] = await postFetch('/hwset', requestOptions);
+			if(!fetchResponse.ok){
+				throw data.detail;
+			}
+			setValidHardwareName(true);
+		} catch(err) {
+			console.log(err);
+			setValidHardwareName(false);
+		}
+	}
 	
 	async function handleSubmit(e){
 		e.preventDefault();
@@ -160,6 +193,27 @@ function Resources() {
 			)
 		}
 	}
+
+	const renderCreateHardwareSetStatus = () => {
+		if (validHardwareName === true) {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="success">
+						Successfully fulfilled request
+					</Alert>
+				</Grid>
+			)
+		}
+		else if (validHardwareName === false) {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="error">
+						Hardware name already exists
+					</Alert>
+				</Grid>
+			)
+		}
+	}
     return(
         <React.Fragment>
 			<div className='infoCard'>
@@ -220,6 +274,52 @@ function Resources() {
 					</Grid>
 				</Grid>
 			</form>
+
+			<div className="addHardwareSet">
+				<Fab color="primary" aria-label="add" onClick={handleAddClick}>
+        			<GrAdd />
+     			</Fab>
+			</div>
+
+			{addHardwareClicked && 
+				<form className='resourceForm' onSubmit={ handleCreateResource } >
+					<Grid container justifyContent="center" spacing={4}>
+						<Grid item xs={12}>
+							<Typography variant="h3">
+								Request Additional Resources
+							</Typography>
+						</Grid>
+
+						<Grid item xs={12}>
+							<TextField
+								required
+								label="Name"
+								onChange ={ e => setHardwareName(e.target.value)}
+							/>
+
+						</Grid>
+						
+						<Grid item xs={12}>
+							<TextField
+								required
+								type="number"
+								label="Capacity"
+								onChange ={ e => setCapacity(Math.abs(parseInt(e.target.value)))}
+							/>
+						</Grid>
+						{renderCreateHardwareSetStatus()}
+						<Grid item xs={6}>
+							<Button type="submit"
+								variant="contained"
+								color="primary"
+							>
+								Request
+							</Button>
+						</Grid>
+					</Grid>
+				</form>
+				
+			}
 		</React.Fragment>
     )
 }

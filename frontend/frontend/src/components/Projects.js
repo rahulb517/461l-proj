@@ -4,18 +4,20 @@ import { AuthContext } from '../AuthContext';
 import { Alert } from '@mui/material';
 import ProjectInfo from './ProjectInfo';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { postFetch, putFetch } from '../utils/utils';
+import { deleteFetch, postFetch, putFetch } from '../utils/utils';
 
 const queryClient = new QueryClient()
 
 function Project() {
 	const [joinProjectId, setJoinProjectId] = React.useState('');
+	const [deleteProjectId, setDeleteProjectId] = React.useState('');
 	const [createProjectId, setCreateProjectId] = React.useState('');
 	const [createProjectName, setCreateProjectName] = React.useState('');
 	const [createProjectDescription, setCreateProjectDescription] = React.useState('');
 	const [user, dispatch] = React.useContext(AuthContext);
 	const [validCreateId, setValidCreateId] = React.useState(null);
 	const [validJoinId, setValidJoinId] = React.useState(null);
+	const [validDeleteId, setValidDeleteId] = React.useState(null);
 	const [errorMessage, setErrorMessage] = React.useState('');
 
 
@@ -45,6 +47,35 @@ function Project() {
 		} catch (err) {
 			console.log(err);
 			setValidJoinId(false);
+			setErrorMessage(err);
+		}
+		
+	}
+
+	async function handleDeleteSubmit(e) {
+		e.preventDefault();
+		let payload = {}
+		payload.member = user.user.replace(/["]+/g, '');
+		payload.project_id = deleteProjectId;		
+
+		const requestOptions = {
+			method: 'DELETE',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		};
+
+		console.log(payload);
+
+		try {
+			const [fetchResponse, data] = await deleteFetch('/projects', requestOptions);
+			if(!fetchResponse.ok){
+				throw data.detail;
+			}
+			setValidDeleteId(true);
+
+		} catch (err) {
+			console.log(err);
+			setValidDeleteId(false);
 			setErrorMessage(err);
 		}
 		
@@ -126,6 +157,27 @@ function Project() {
 		}
 	}
 
+	const renderDeleteProjectStatus = () => {
+		if (validDeleteId === true) {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="success">
+						Successfully deleted project {deleteProjectId}
+					</Alert>
+				</Grid>
+			)
+		}
+
+		else if (validDeleteId === false) {
+			return(
+				<Grid item xs={12}>
+					<Alert severity="error">
+						{errorMessage}
+					</Alert>
+				</Grid>
+			)
+		}
+	}
 
 	return (
 		<React.Fragment>
@@ -210,6 +262,36 @@ function Project() {
 						color="primary"
 					>
 						Create
+					</Button>
+				</Grid>
+
+			</Grid>
+			</form>
+			<form className='joinProject' onSubmit={ handleDeleteSubmit } >
+			<Grid container spacing={4}>
+				<Grid item xs={12}>
+					<Typography variant="h4">
+						Delete Project
+					</Typography>
+				</Grid>
+
+				<Grid item xs={12}>
+					<TextField
+						required
+						label="Project Id"
+						onInput ={ e => setDeleteProjectId(e.target.value)}
+					/>
+				</Grid>
+
+				{renderDeleteProjectStatus()}
+
+				<Grid item xs={12}>
+					<Button
+						type="submit"
+						variant="contained"
+						color="primary"
+					>
+						Delete
 					</Button>
 				</Grid>
 

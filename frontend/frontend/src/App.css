@@ -62,3 +62,9 @@
 	width: 50%;
 	margin: auto;
 }
+
+.addHardwareSet {
+	position: fixed;
+  	bottom: 3px;
+  	right: 10px;
+}

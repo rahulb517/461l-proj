@@ -8,7 +8,6 @@ import { red } from '@mui/material/colors';
 
 
 function Home() {
-	const [user, dispatch] = React.useContext(AuthContext)
 	const history = useHistory();
 
 	function handleLoginClick(){
