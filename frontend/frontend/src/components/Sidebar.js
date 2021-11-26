@@ -4,6 +4,7 @@ import { FaBars } from "react-icons/fa";
 import { SidebarRoutes } from '../constants/SidebarRoutes';
 import '../styles/Sidebar.css';
 
+// when the user clicks away, the sidebar automatically closes
 let useClickOutside = (handler) => {
 	let navRef = React.useRef();
 
@@ -45,6 +46,7 @@ function Sidebar() {
 			
 			<nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
 				<ul className='menu-items' onClick={showSidebar}>
+					{/* this uses the sidebar routes that were defined in the constants folder */}
 					{ SidebarRoutes.map((item, index) => {
 						if (item.hasOwnProperty('route')) {
 							return (

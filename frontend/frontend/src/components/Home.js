@@ -1,10 +1,7 @@
 import React from 'react';
-import { AuthContext } from '../AuthContext';
 import { Stack, Fab} from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import '../styles/Home.css';
-import { red } from '@mui/material/colors';
-
 
 
 function Home() {
@@ -17,6 +14,7 @@ function Home() {
 	function handleSignupClick(){
 		history.push('/signup')
 	}
+	// this uses the sidebar used in the internal pages and we also include buttons to the login and signup pages
 
 	return (
 		<div className='Home'>

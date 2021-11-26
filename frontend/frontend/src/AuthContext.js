@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const AuthContext = React.createContext();
-
+// this is a central store for global state, i.e. the username and access token
 const initialState = {
 	isAuth: localStorage.getItem('isAuth'),
 	user: localStorage.getItem('user'),

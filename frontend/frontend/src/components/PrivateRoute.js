@@ -4,6 +4,7 @@ import { AuthContext } from '../AuthContext'
 
 function PrivateRoute({children, ...rest}){
     const [user, dispatch] = React.useContext(AuthContext)
+	// if a user is not authenticated and tries to access a private route, it will redirect them to the login page
     return(
         <Route
             {...rest}

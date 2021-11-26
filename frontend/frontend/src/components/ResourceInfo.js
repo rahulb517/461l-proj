@@ -14,6 +14,9 @@ function ResourceInfo() {
 	});
 	console.log(data)
 
+	// this will render the hardware set information, regardless of the number of resources
+	// for checkpoint 2 we assumed there are only 2 hardware sets and we hardcoded it as such, but we have now
+	// refactored and have better code
 	function renderHardwareData() {
 		let hardwareSets = [];
 		for(let key of Object.keys(data)) {	

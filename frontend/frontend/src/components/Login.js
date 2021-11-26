@@ -18,6 +18,7 @@ function Login() {
 		myJSON.username = username;
 		myJSON.password = password;
 		console.log(myJSON);
+		// FastAPI password bearer requires login information to be url encoded
 		const requestOptions = {
 			method: "POST",
 			headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -32,6 +33,7 @@ function Login() {
 				throw data.detail;
 			}
 			setVerifyPassword(true);
+			// this sets the global state for the JWT access token and username
 			dispatch({
 				type: 'LOGIN',
 				payload: {

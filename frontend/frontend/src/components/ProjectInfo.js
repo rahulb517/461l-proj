@@ -19,6 +19,7 @@ function ProjectInfo() {
 	console.log(data)
 
 	function renderProjectList() {
+		// this renders the list of projects by iterating through the JSON array
 		let projects = []
 		for (const project of data['projects']){
 			projects.push(<p key={project}>{project}</p>);

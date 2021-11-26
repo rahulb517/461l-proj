@@ -7,7 +7,7 @@ import { getFetch } from '../utils/utils';
 function ProjectDetail(){
     const [user, dispatch] = React.useContext(AuthContext);
 	const {data, status} = useQuery('projectdetails', async () => {
-		let userId = user.user.replace(/["]+/g, '')
+		let userId = user.user.replace(/["]+/g, ''); // this removes quotes around the username, if any. This is important when the user refreshes the page
 		const projectDetailData = await getFetch(`/projects/hardware/${userId}`);
 		return projectDetailData;
 	}, {

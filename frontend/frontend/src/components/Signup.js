@@ -52,6 +52,7 @@ function Signup() {
 				</Grid>
 
 				<Grid item xs={12}>
+					{/* when we use the type=password prop, it censors the password as you'd expect */}
 					<TextField
 						required
 						id="standard-password-input"

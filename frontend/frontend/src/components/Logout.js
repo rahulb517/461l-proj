@@ -4,7 +4,7 @@ import { AuthContext } from '../AuthContext'
 
 function Logout(){
     const [user, dispatch] = React.useContext(AuthContext);
-    
+    // this clears the JWT token, so a user will have to re-authenticate to access protected pages
     useEffect(() => {    
         dispatch({
             type: 'LOGOUT',
