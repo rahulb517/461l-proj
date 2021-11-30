@@ -105,6 +105,7 @@ def signup(signupData: Signup):
 	else:
 		raise HTTPException(status_code=400, detail="User already exists")
 
+# either checkin or checkout a hw set
 @app.post('/api/resources')
 def transaction(transaction: Transaction):
 	# disconnect()
@@ -173,6 +174,7 @@ def get_projects_detail(userId: str):
 		projects.append(entry)
 	return {'projectdetails': projects}
 
+# method to create a project 
 @app.post('/api/projects')
 def projects_create(newProject: NewProject):
 	# disconnect()
@@ -199,7 +201,7 @@ def projects_create(newProject: NewProject):
 		raise HTTPException(status_code=400, detail="Project id already exists")
 	
 	
-
+# method to update project information
 @app.put('/api/projects')
 def project_update(updatedProject: UpdatedProject):
 	# disconnect()
@@ -283,6 +285,8 @@ def project_update(updatedProject: UpdatedProject):
 	else:
 		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
+
+# delete a project 
 @app.delete('/api/projects')
 def project_delete(deleteProject: DeleteProject):
 	# disconnect()
@@ -324,6 +328,7 @@ def project_delete(deleteProject: DeleteProject):
 		raise HTTPException(status_code=400, detail="Project id doesnt exist")
 
 
+#  specific datasets to parse from physionet
 @app.get('/api/datasets')
 def scrape():
 	URL1 = "https://physionet.org/content/accelerometry-walk-climb-drive/1.0.0/"
@@ -378,6 +383,8 @@ def hwset_create(newHw: NewHwset):
 	else:	
 		raise HTTPException(status_code=400, detail="Hardware name already exists") 
 
+
+# scrape the given URL and return map of values 
 def parse(URL):
 	r = requests.get(URL)
 	soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
